@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HIPIND Deck</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230f1115'/%3E%3Crect x='24' y='24' width='132' height='132' rx='28' stroke='%23ffffff' stroke-width='10' transform='rotate(45 90 90)' fill='none'/%3E%3Crect x='44' y='44' width='92' height='92' rx='16' fill='%23ffffff' transform='rotate(45 90 90)'/%3E%3Cpath d='M70 68 V112 M110 68 V112 M70 90 H110' stroke='%230f1115' stroke-width='9' stroke-linecap='square'/%3E%3Cpath d='M120 68 V112 H130 C141 112 148 104 148 90 C148 76 141 68 130 68 H120' stroke='%230f1115' stroke-width='9' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
 <style>
   :root {
     --ui-bg:#f4f6fb; --ui-panel:#ffffff; --ui-border:#e2e6ef; --ui-text:#1a1d24;
@@ -47,6 +48,7 @@
   .theme-toggle { position:fixed; top:16px; right:16px; z-index:100; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--ui-panel); color:var(--ui-text); border:1px solid var(--ui-border); font-size:18px; line-height:1; padding:0; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: background .2s, color .2s, border-color .2s, transform .15s; }
   .theme-toggle:hover { transform: scale(1.05); filter:none; }
 
+  /* --- Пузырёк пользователя --- */
   .user-bubble {
     position: fixed; top: 8px; left: 16px; z-index: 100;
     display: flex; align-items: center; gap: 8px;
@@ -59,14 +61,50 @@
   .user-bubble .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ui-field); border: 1px solid var(--ui-border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--ui-muted); overflow: hidden; flex-shrink: 0; }
   .user-bubble .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .user-bubble .nick { font-weight: 600; color: var(--ui-text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .user-bubble .pencil { width: 22px; height: 22px; border-radius: 6px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ui-muted); font-size: 14px; padding: 0; transition: background .15s, color .15s; }
+  .user-bubble .pencil, .user-bubble .trash { width: 22px; height: 22px; border-radius: 6px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ui-muted); font-size: 14px; padding: 0; transition: background .15s, color .15s; }
   .user-bubble .pencil:hover { background: var(--ui-field); color: var(--ui-text); filter: none; }
-  .user-bubble .trash { width: 22px; height: 22px; border-radius: 6px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ui-muted); font-size: 14px; padding: 0; transition: background .15s, color .15s; }
   .user-bubble .trash:hover { background: #ff6b6b; color: #fff; filter: none; }
   .user-bubble .auth-btn { padding: 6px 12px; border-radius: 999px; font-size: 12px; background: var(--accent-btn); color: #fff; font-weight: 600; }
   .user-bubble .auth-btn.ghost { background: transparent; color: var(--ui-text); border: 1px solid var(--ui-border); }
   .user-bubble .auth-btn.ghost:hover { background: var(--ui-field); }
 
+  /* --- Пузырёк «Проекты» --- */
+  .projects-bubble {
+    position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 100;
+    background: var(--ui-panel); border: 1px solid var(--ui-border);
+    border-radius: 999px; padding: 6px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 600;
+    color: var(--ui-text);
+    transition: background .2s, border-color .2s, transform .15s;
+  }
+  .projects-bubble:hover { filter: brightness(1.03); transform: translateX(-50%) translateY(-1px); }
+  .projects-bubble .icon { font-size: 15px; }
+
+  /* --- Панель проектов --- */
+  .projects-panel {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+    z-index: 150; width: 92%; max-width: 560px;
+    background: var(--ui-panel); border: 1px solid var(--ui-border);
+    border-radius: 16px; padding: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    display: none; max-height: 70vh; overflow-y: auto;
+  }
+  .projects-panel.show { display: block; }
+  .projects-panel h3 { font-size: 15px; margin-bottom: 10px; color: var(--ui-text); }
+  .projects-list { display: flex; flex-direction: column; gap: 8px; }
+  .project-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--ui-field); border: 1px solid var(--ui-field-border); border-radius: 10px; }
+  .project-item .meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .project-item .title { font-size: 13px; font-weight: 600; color: var(--ui-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .project-item .date { font-size: 11px; color: var(--ui-muted); }
+  .project-item .dl-btn { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #1f9d55; color: #fff; white-space: nowrap; }
+  .project-item .del-btn { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #dc2626; color: #fff; white-space: nowrap; margin-left: 4px; }
+  .projects-empty { color: var(--ui-muted); font-size: 13px; text-align: center; padding: 20px 0; }
+  .projects-msg { font-size: 12px; color: #ff6b6b; margin-top: 8px; }
+  .projects-msg.ok { color: #3ecf8e; }
+
+  /* --- Модальные окна --- */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.show { display: flex; }
   .modal { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); color: var(--ui-text); }
@@ -86,14 +124,14 @@
   .pass-wrap input { padding-right: 42px; }
   .pass-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 8px; background: transparent; color: var(--ui-muted); display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; cursor: pointer; transition: background .15s, color .15s; }
   .pass-toggle:hover { background: var(--ui-field); color: var(--ui-text); filter: none; }
-
-  /* Стили для кнопки подтверждения с таймером */
   .btn-danger { background: #dc2626; width: 100%; margin-top: 18px; }
   .btn-danger:disabled { background: #dc2626; }
 
   @media (max-width: 600px) {
     body { padding-top: 72px; }
     .user-bubble { top: 8px; left: 8px; }
+    .projects-bubble { top: 60px; left: 50%; transform: translateX(-50%); }
+    .projects-panel { top: 110px; }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
@@ -113,6 +151,17 @@
     <button class="auth-btn ghost" id="logoutBtn">Выйти</button>
   </div>
   <input type="file" id="avatarInput" accept="image/*" style="display:none">
+</div>
+
+<div class="projects-bubble" id="projectsBubble">
+  <span class="icon">📁</span>
+  <span>Проекты</span>
+</div>
+
+<div class="projects-panel" id="projectsPanel">
+  <h3>Мои проекты</h3>
+  <div class="projects-list" id="projectsList"></div>
+  <div class="projects-msg" id="projectsMsg"></div>
 </div>
 
 <button class="theme-toggle" id="themeToggle" title="Сменить тему интерфейса" aria-label="Сменить тему"><span id="themeIcon">🌙</span></button>
@@ -176,7 +225,7 @@
   </div>
 </div>
 
-<!-- Модальное окно авторизации -->
+<!-- Модалка авторизации -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-wrap">
     <div class="modal">
@@ -199,13 +248,13 @@
   </div>
 </div>
 
-<!-- Модальное окно удаления аккаунта -->
+<!-- Модалка удаления аккаунта -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-wrap">
     <div class="modal">
       <button class="close-btn" id="closeDeleteBtn" aria-label="Закрыть">✕</button>
       <h2>Удалить аккаунт?</h2>
-      <div class="subtitle">Все ваши данные (никнейм, аватарка, пароль) будут безвозвратно удалены.</div>
+      <div class="subtitle">Все ваши данные будут безвозвратно удалены.</div>
       <div class="msg" id="deleteMsg"></div>
       <div class="actions">
         <button class="btn-secondary" id="deleteCancelBtn" style="margin-top:0;">Отменить</button>
@@ -216,20 +265,33 @@
 </div>
 
 <script>
-/* ======================== Авторизация ======================== */
+/* ======================== Переменные ======================== */
 const STORAGE_USERS = 'hipind_users_v1';
 const STORAGE_SESSION = 'hipind_session_v1';
+const STORAGE_PROJECTS = 'hipind_projects_v1';
 
+/* USERS: { nickLower: { nick, passHash, avatar } } */
 let USERS = {};
+
+/* PROJECTS: { nickLower: [ { title, topic, theme, contentStyle, slides, date } ] }
+   Проекты привязаны к аккаунту по нику в нижнем регистре. */
+let PROJECTS = {};
 
 function loadUsers() {
   try { USERS = JSON.parse(localStorage.getItem(STORAGE_USERS) || '{}'); }
   catch(e) { USERS = {}; }
-  return USERS;
 }
 function saveUsers() {
   try { localStorage.setItem(STORAGE_USERS, JSON.stringify(USERS)); } catch(e) {}
 }
+function loadAllProjects() {
+  try { PROJECTS = JSON.parse(localStorage.getItem(STORAGE_PROJECTS) || '{}'); }
+  catch(e) { PROJECTS = {}; }
+}
+function saveAllProjects() {
+  try { localStorage.setItem(STORAGE_PROJECTS, JSON.stringify(PROJECTS)); } catch(e) {}
+}
+
 function getSession() {
   try { return localStorage.getItem(STORAGE_SESSION); } catch(e) { return null; }
 }
@@ -241,16 +303,121 @@ function setSession(nick) {
 }
 function hashPassword(pass) {
   let h = 0;
-  for (let i = 0; i < pass.length; i++) {
-    h = ((h << 5) - h) + pass.charCodeAt(i);
-    h |= 0;
-  }
+  for (let i = 0; i < pass.length; i++) { h = ((h << 5) - h) + pass.charCodeAt(i); h |= 0; }
   return 'h' + Math.abs(h).toString(36);
 }
 
 let currentUser = null;
 
-/* ---------- Модалка авторизации ---------- */
+/* ---------- Проекты ---------- */
+function getUserProjects() {
+  if (!currentUser) return [];
+  return PROJECTS[currentUser.nick.toLowerCase()] || [];
+}
+function saveUserProjects(list) {
+  if (!currentUser) return false;
+  PROJECTS[currentUser.nick.toLowerCase()] = list;
+  try { saveAllProjects(); return true; }
+  catch(e) { console.warn('Не удалось сохранить проекты:', e); return false; }
+}
+function addProject(project) {
+  if (!currentUser) return false;
+  const list = getUserProjects();
+  list.unshift(project);
+  return saveUserProjects(list.slice(0, 30));
+}
+function renderProjects() {
+  const listEl = document.getElementById('projectsList');
+  const msgEl = document.getElementById('projectsMsg');
+  msgEl.textContent = '';
+  msgEl.className = 'projects-msg';
+
+  if (!currentUser) {
+    listEl.innerHTML = '<div class="projects-empty">Войдите в аккаунт, чтобы видеть свои проекты.</div>';
+    return;
+  }
+
+  const projects = getUserProjects();
+  if (!projects.length) {
+    listEl.innerHTML = '<div class="projects-empty">Пока нет сохранённых проектов. Сгенерируйте презентацию — она появится здесь.</div>';
+    return;
+  }
+
+  listEl.innerHTML = projects.map((p, i) => `
+    <div class="project-item">
+      <div class="meta">
+        <div class="title">${escapeHtml(p.title)}</div>
+        <div class="date">${escapeHtml(p.date)}</div>
+      </div>
+      <div>
+        <button class="dl-btn" data-project-index="${i}">Скачать</button>
+        <button class="del-btn" data-delete-index="${i}">✕</button>
+      </div>
+    </div>
+  `).join('');
+
+  listEl.querySelectorAll('.dl-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.getAttribute('data-project-index'));
+      downloadProject(idx);
+    });
+  });
+  listEl.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.getAttribute('data-delete-index'));
+      deleteProject(idx);
+    });
+  });
+}
+function toggleProjectsPanel() {
+  const panel = document.getElementById('projectsPanel');
+  if (!currentUser) {
+    panel.classList.remove('show');
+    document.getElementById('loginBtn').style.boxShadow = '0 0 0 3px rgba(79,124,255,0.4)';
+    setTimeout(() => { document.getElementById('loginBtn').style.boxShadow = ''; }, 1200);
+    return;
+  }
+  if (panel.classList.contains('show')) {
+    panel.classList.remove('show');
+  } else {
+    renderProjects();
+    panel.classList.add('show');
+  }
+}
+async function downloadProject(idx) {
+  if (!currentUser) return;
+  const projects = getUserProjects();
+  const p = projects[idx];
+  if (!p) return;
+
+  const prevSlides = state.slides;
+  const prevTopic = state.topic;
+  const prevTheme = state.theme;
+  const prevContentStyle = state.contentStyle;
+
+  state.slides = p.slides;
+  state.topic = p.topic;
+  state.theme = p.theme;
+  state.contentStyle = p.contentStyle || 'business';
+
+  try {
+    await exportPptx();
+  } finally {
+    state.slides = prevSlides;
+    state.topic = prevTopic;
+    state.theme = prevTheme;
+    state.contentStyle = prevContentStyle;
+  }
+}
+function deleteProject(idx) {
+  if (!currentUser) return;
+  const list = getUserProjects();
+  list.splice(idx, 1);
+  saveUserProjects(list);
+  renderProjects();
+}
+
+/* ---------- Авторизация ---------- */
 function showAuthModal(mode) {
   const modal = document.getElementById('authModal');
   const title = document.getElementById('authTitle');
@@ -344,6 +511,7 @@ function logout() {
   setSession(null);
   currentUser = null;
   updateBubble();
+  document.getElementById('projectsPanel').classList.remove('show');
 }
 
 function updateBubble() {
@@ -356,11 +524,8 @@ function updateBubble() {
     guest.style.display = 'none';
     user.style.display = 'flex';
     nickEl.textContent = currentUser.nick;
-    if (currentUser.avatar) {
-      avatarEl.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
-    } else {
-      avatarEl.textContent = currentUser.nick.charAt(0).toUpperCase();
-    }
+    if (currentUser.avatar) avatarEl.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
+    else avatarEl.textContent = currentUser.nick.charAt(0).toUpperCase();
   } else {
     guest.style.display = 'flex';
     user.style.display = 'none';
@@ -371,11 +536,8 @@ function restoreSession() {
   const nick = getSession();
   if (!nick) { updateBubble(); return; }
   const user = USERS[nick.toLowerCase()];
-  if (user) {
-    currentUser = { nick: user.nick, avatar: user.avatar || '' };
-  } else {
-    setSession(null);
-  }
+  if (user) currentUser = { nick: user.nick, avatar: user.avatar || '' };
+  else setSession(null);
   updateBubble();
 }
 
@@ -389,7 +551,6 @@ function showDeleteModal() {
   document.getElementById('deleteMsg').className = 'msg';
   document.getElementById('deleteModal').classList.add('show');
 
-  // запускаем таймер
   deleteCountdown = 10;
   const btn = document.getElementById('deleteConfirmBtn');
   btn.disabled = true;
@@ -408,39 +569,24 @@ function showDeleteModal() {
     }
   }, 1000);
 }
-
 function hideDeleteModal() {
   document.getElementById('deleteModal').classList.remove('show');
-  if (deleteTimerInterval) {
-    clearInterval(deleteTimerInterval);
-    deleteTimerInterval = null;
-  }
+  if (deleteTimerInterval) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; }
 }
-
 function confirmDeleteAccount() {
   if (!currentUser) return;
   const btn = document.getElementById('deleteConfirmBtn');
   if (btn.disabled) return;
 
-  // Удаляем пользователя из USERS и localStorage
   const key = currentUser.nick.toLowerCase();
   delete USERS[key];
+  delete PROJECTS[key];  // удаляем и проекты этого пользователя
   saveUsers();
-
-  // Чистим сессию
+  saveAllProjects();
   setSession(null);
   currentUser = null;
   updateBubble();
-
-  // Закрываем модалку
   hideDeleteModal();
-
-  // Сообщение об успехе
-  const msgEl = document.getElementById('deleteMsg');
-  if (msgEl) {
-    msgEl.className = 'msg ok';
-    msgEl.textContent = 'Аккаунт удалён.';
-  }
 }
 
 /* ======================== Приложение ======================== */
@@ -659,9 +805,25 @@ if (el.generateBtn) el.generateBtn.addEventListener('click', () => {
     if (el.applyBtn) el.applyBtn.disabled = false;
     if (el.downloadBtn) el.downloadBtn.disabled = false;
 
-    genStatus.textContent = `Готово: ${state.slides.length} слайд(ов), тема «${getTheme(theme).name}».`;
+    if (currentUser) {
+      const project = {
+        title: topic,
+        topic: topic,
+        theme: theme,
+        contentStyle: contentStyle,
+        slides: JSON.parse(JSON.stringify(state.slides)),
+        date: new Date().toLocaleString('ru-RU')
+      };
+      const ok = addProject(project);
+      if (ok) genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Проект сохранён в «Мои проекты».`;
+      else genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Не удалось сохранить проект (localStorage переполнен).`;
+    } else {
+      genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Войдите, чтобы сохранять проекты.`;
+    }
     genStatus.className = 'status ok';
     revStatus.textContent = '';
+
+    if (document.getElementById('projectsPanel').classList.contains('show')) renderProjects();
   } catch (e) {
     console.error(e);
     genStatus.textContent = 'Ошибка: ' + (e && e.message ? e.message : e);
@@ -681,6 +843,16 @@ if (el.applyBtn) el.applyBtn.addEventListener('click', () => {
     revStatus.textContent = 'Правки применены.';
     revStatus.className = 'status ok';
     if (el.revision) el.revision.value = '';
+
+    // Обновляем последний сохранённый проект (если пользователь вошёл)
+    if (currentUser) {
+      const list = getUserProjects();
+      if (list.length) {
+        list[0].slides = JSON.parse(JSON.stringify(state.slides));
+        saveUserProjects(list);
+        if (document.getElementById('projectsPanel').classList.contains('show')) renderProjects();
+      }
+    }
   } catch (e) {
     console.error(e);
     revStatus.textContent = 'Ошибка: ' + (e && e.message ? e.message : e);
@@ -738,23 +910,14 @@ document.getElementById('changeAvatarBtn').addEventListener('click', () => {
 document.getElementById('avatarInput').addEventListener('change', (e) => {
   const file = e.target.files && e.target.files[0];
   if (!file || !currentUser) return;
-  if (!file.type.startsWith('image/')) {
-    alert('Выберите файл изображения.');
-    return;
-  }
+  if (!file.type.startsWith('image/')) { alert('Выберите файл изображения.'); return; }
   const reader = new FileReader();
   reader.onload = () => {
     const dataUrl = reader.result;
-    if (dataUrl.length > 1_500_000) {
-      alert('Файл слишком большой. Выберите изображение меньше 1 МБ.');
-      return;
-    }
+    if (dataUrl.length > 1_500_000) { alert('Файл слишком большой. Выберите изображение меньше 1 МБ.'); return; }
     currentUser.avatar = dataUrl;
     const key = currentUser.nick.toLowerCase();
-    if (USERS[key]) {
-      USERS[key].avatar = dataUrl;
-      saveUsers();
-    }
+    if (USERS[key]) { USERS[key].avatar = dataUrl; saveUsers(); }
     updateBubble();
   };
   reader.readAsDataURL(file);
@@ -769,7 +932,19 @@ document.getElementById('deleteModal').addEventListener('click', e => {
   if (e.target.id === 'deleteModal') hideDeleteModal();
 });
 
+/* ======================== Проекты ======================== */
+document.getElementById('projectsBubble').addEventListener('click', toggleProjectsPanel);
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('projectsPanel');
+  const bubble = document.getElementById('projectsBubble');
+  if (!panel.classList.contains('show')) return;
+  if (panel.contains(e.target) || bubble.contains(e.target)) return;
+  panel.classList.remove('show');
+});
+
+/* ======================== Инициализация ======================== */
 loadUsers();
+loadAllProjects();
 restoreSession();
 
 applyThemeToPreview(state.theme);
