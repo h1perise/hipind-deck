@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIPIND Deck</title>
+<style>
+  /* Светлая тема (по умолчанию) */
+  :root {
+    --ui-bg:#f4f6fb; --ui-panel:#ffffff; --ui-border:#e2e6ef; --ui-text:#1a1d24;
+    --ui-muted:#6b7385; --ui-field:#f7f9fc; --ui-field-border:#d6dbe6;
+    --ui-btn-secondary:#eef1f7; --ui-btn-secondary-text:#1a1d24;
+    --accent-btn:#4f7cff;
+
+    --slide-bg:#FFFFFF;
+    --slide-accent:#4472C4;
+    --slide-title:#1F1F1F;
+    --slide-text:#3A3A3A;
+    --slide-num:#8C8C8C;
+    --slide-font-title: Calibri, sans-serif;
+    --slide-font-body: Calibri, sans-serif;
+  }
+  /* Тёмная тема интерфейса */
+  [data-ui-theme="dark"] {
+    --ui-bg:#0f1115; --ui-panel:#171a21; --ui-border:#262b36; --ui-text:#e6e9ef;
+    --ui-muted:#8a93a6; --ui-field:#0f1115; --ui-field-border:#2b3140;
+    --ui-btn-secondary:#232936; --ui-btn-secondary-text:#e6e9ef;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  body { background:var(--ui-bg); color:var(--ui-text); min-height:100vh; display:flex; justify-content:center; padding:24px; transition:background .2s, color .2s; }
+
+  .app { width:100%; max-width:1100px; display:grid; grid-template-columns:340px 1fr; gap:24px; }
+  @media (max-width:860px){ .app{ grid-template-columns:1fr; } }
+
+  .panel { background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:16px; padding:20px; transition:background .2s, border-color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; font-weight:700; letter-spacing:-0.02em; color:var(--ui-text); }
+  label { display:block; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ui-muted); margin-bottom:6px; margin-top:14px; }
+
+  input, textarea, select {
+    width:100%; background:var(--ui-field); border:1px solid var(--ui-field-border); color:var(--ui-text);
+    border-radius:10px; padding:10px 12px; font-size:14px; outline:none; transition:border .15s, background .2s, color .2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color:var(--accent-btn); }
+  textarea { resize:vertical; min-height:64px; }
+
+  button { cursor:pointer; border:none; border-radius:10px; padding:12px 16px; font-size:14px; font-weight:600; transition:filter .15s, opacity .15s, background .2s, color .2s; color:#fff; }
+  button:hover { filter:brightness(1.1); }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  .btn-primary { background:var(--accent-btn); width:100%; margin-top:18px; }
+  .btn-secondary { background:var(--ui-btn-secondary); color:var(--ui-btn-secondary-text); width:100%; margin-top:12px; }
+  .btn-download { background:#1f9d55; width:auto; padding:10px 18px; }
+
+  .slides { display:flex; flex-direction:column; gap:16px; }
+  /* Стиль превью слайда зависит только от выбранной PowerPoint-темы */
+  .slide {
+    background:var(--slide-bg);
+    border:1px solid var(--ui-border); border-radius:14px; padding:28px 32px;
+    min-height:160px; position:relative; overflow:hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition:background .2s;
+  }
+  .slide::before { content:''; position:absolute; left:0; top:0; bottom:0; width:8px; background:var(--slide-accent); }
+  .slide-num { font-family: var(--slide-font-body); font-size:11px; color:var(--slide-num); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px; }
+  .slide-title { font-family: var(--slide-font-title); font-size:22px; font-weight:700; margin-bottom:14px; line-height:1.25; color:var(--slide-title); }
+  .slide-body { font-family: var(--slide-font-body); font-size:14px; line-height:1.65; color:var(--slide-text); white-space:pre-wrap; }
+
+  .empty { color:var(--ui-muted); text-align:center; padding:60px 20px; font-size:14px; line-height:1.7; }
+  .status { font-size:12px; color:var(--ui-muted); margin-top:10px; }
+  .status.ok { color:#3ecf8e; }
+  .status.err { color:#ff6b6b; }
+
+  /* Кнопка смены темы */
+  .theme-toggle {
+    position:fixed; top:16px; right:16px; z-index:100;
+    width:42px; height:42px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--ui-panel); color:var(--ui-text);
+    border:1px solid var(--ui-border);
+    font-size:18px; line-height:1; padding:0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transition: background .2s, color .2s, border-color .2s, transform .15s;
+  }
+  .theme-toggle:hover { transform: scale(1.05); filter:none; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+</head>
+<body>
+<!-- Кнопка смены темы в правом верхнем углу -->
+<button class="theme-toggle" id="themeToggle" title="Сменить тему интерфейса" aria-label="Сменить тему">
+  <span id="themeIcon">🌙</span>
+</button>
+
+<div class="app">
+  <div>
+    <div class="panel">
+      <h1>HIPIND Deck</h1>
+      <label for="topic">Тема презентации</label>
+      <input id="topic" type="text" placeholder="Например: Введение в машинное обучение">
+      <label for="slideCount">Количество слайдов</label>
+      <input id="slideCount" type="number" min="1" max="50" value="5">
+      <label for="contentStyle">Стиль изложения</label>
+      <select id="contentStyle">
+        <option value="business">Деловой</option>
+        <option value="educational">Учебный</option>
+        <option value="marketing">Маркетинговый</option>
+        <option value="technical">Технический</option>
+      </select>
+      <label for="theme">Тема конструктора PowerPoint</label>
+      <select id="theme">
+        <option value="office">Office (Базовый)</option>
+        <option value="facet">Facet (Зеленый)</option>
+        <option value="ion">Ion (Темно-синий)</option>
+        <option value="integral">Integral (Красный)</option>
+        <option value="retrospect">Retrospect (Бежевый)</option>
+        <option value="slice">Slice (Оранжевый)</option>
+        <option value="wisp">Wisp (Салатовый)</option>
+        <option value="badge">Badge (Яркий)</option>
+        <option value="banded">Banded (Синий)</option>
+        <option value="gallery">Gallery (Серый)</option>
+        <option value="mainevent">Main Event (Черный)</option>
+        <option value="metropolitan">Metropolitan (Строгий)</option>
+        <option value="parallax">Parallax (Голубой)</option>
+        <option value="dividend">Dividend (Зеленый)</option>
+        <option value="frame">Frame (Рамка)</option>
+        <option value="berlin">Berlin (Красный)</option>
+        <option value="celestial">Celestial (Космос)</option>
+        <option value="droplet">Droplet (Вода)</option>
+        <option value="headline">Headline (Газета)</option>
+        <option value="linen">Linen (Лен)</option>
+        <option value="mesh">Mesh (Сетка)</option>
+        <option value="organic">Organic (Природа)</option>
+        <option value="savon">Savon (Мыло)</option>
+        <option value="vivid">Vivid (Розовый)</option>
+        <option value="waves">Waves (Волны)</option>
+      </select>
+      <button class="btn-primary" id="generateBtn">Сгенерировать презентацию</button>
+      <div class="status" id="genStatus"></div>
+    </div>
+    <div class="panel" style="margin-top:20px;">
+      <h1 style="font-size:16px;">Правки</h1>
+      <label for="revision">Что исправить в готовой презентации</label>
+      <textarea id="revision" placeholder="Например: убери слайд 2, удали пункт про метрики, сократи слайд 3" disabled></textarea>
+      <button class="btn-secondary" id="applyBtn" disabled>Применить правки</button>
+      <div class="status" id="revStatus"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h1 style="margin:0;">Слайды</h1>
+      <button class="btn-download" id="downloadBtn" disabled>Скачать .pptx</button>
+    </div>
+    <div class="slides" id="slides">
+      <div class="empty">Презентация ещё не создана.<br>Укажите тему и количество слайдов, затем нажмите «Сгенерировать презентацию».</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   HIPIND Deck — генератор презентаций
+   ============================================================ */
+
+const state = { topic:'', contentStyle:'business', theme:'office', slides:[] };
+const $ = id => document.getElementById(id);
+const genStatus = $('genStatus');
+const revStatus = $('revStatus');
+
+/* ---------- Тема интерфейса (светлая / тёмная) ---------- */
+const UI_KEY = 'hipind_ui_theme';
+function applyUiTheme(mode){
+  if (mode === 'dark') {
+    document.documentElement.setAttribute('data-ui-theme','dark');
+    $('themeIcon').textContent = '☀️';
+  } else {
+    document.documentElement.removeAttribute('data-ui-theme');
+    $('themeIcon').textContent = '🌙';
+  }
+  localStorage.setItem(UI_KEY, mode);
+}
+$('themeToggle').addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-ui-theme') === 'dark';
+  applyUiTheme(isDark ? 'light' : 'dark');
+});
+// Восстановление темы при загрузке
+applyUiTheme(localStorage.getItem(UI_KEY) || 'light');
+
+/* ---------- Темы PowerPoint ---------- */
+const PPT_THEMES = {
+  office:      { name:'Office',       bg:'FFFFFF', accent:'4472C4', title:'1F1F1F', text:'3A3A3A', num:'8C8C8C', fontTitle:'Calibri', fontBody:'Calibri', decor: 'left-stripe' },
+  facet:       { name:'Facet',        bg:'F2F2F2', accent:'7FBA00', title:'1A1A1A', text:'3F3F3F', num:'808080', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'corner-shape' },
+  ion:         { name:'Ion',          bg:'1F3864', accent:'4BACC6', title:'FFFFFF', text:'D6E4F0', num:'9DC3E6', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'bottom-bar' },
+  integral:    { name:'Integral',     bg:'FFFFFF', accent:'C00000', title:'000000', text:'404040', num:'808080', fontTitle:'Arial Black', fontBody:'Arial', decor: 'top-bar' },
+  retrospect:  { name:'Retrospect',   bg:'F7F3E9', accent:'806000', title:'3B2E1E', text:'5B4A34', num:'9C8060', fontTitle:'Georgia', fontBody:'Calibri', decor: 'double-line' },
+  slice:       { name:'Slice',        bg:'FFFFFF', accent:'ED7D31', title:'1A1A1A', text:'3F3F3F', num:'A6A6A6', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'corner-shape' },
+  wisp:        { name:'Wisp',         bg:'F2F7F2', accent:'70AD47', title:'1E3B22', text:'33503A', num:'7F9F88', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'corner-shape' },
+  badge:       { name:'Badge',        bg:'FFFFFF', accent:'FF0000', title:'000000', text:'262626', num:'808080', fontTitle:'Impact', fontBody:'Calibri', decor: 'top-bar' },
+  banded:      { name:'Banded',       bg:'FFFFFF', accent:'1F4E79', title:'1F4E79', text:'333333', num:'7F7F7F', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'left-stripe' },
+  gallery:     { name:'Gallery',      bg:'FBFBFB', accent:'5B9BD5', title:'222222', text:'404040', num:'A5A5A5', fontTitle:'Georgia', fontBody:'Calibri', decor: 'bottom-bar' },
+  mainevent:   { name:'Main Event',   bg:'0A0A0A', accent:'FFC000', title:'FFFFFF', text:'D9D9D9', num:'808080', fontTitle:'Impact', fontBody:'Calibri', decor: 'left-stripe' },
+  metropolitan: { name:'Metropolitan', bg:'EDEDED', accent:'404040', title:'1A1A1A', text:'404040', num:'808080', fontTitle:'Georgia', fontBody:'Calibri', decor: 'top-bar' },
+  parallax:    { name:'Parallax',     bg:'0E1B2C', accent:'1F9BD1', title:'FFFFFF', text:'C9D6E3', num:'7F93A8', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'corner-shape' },
+  dividend:    { name:'Dividend',     bg:'FFFFFF', accent:'2E7D32', title:'1B5E20', text:'33691E', num:'7F8C7F', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'bottom-bar' },
+  frame:       { name:'Frame',        bg:'F2F2F2', accent:'7F7F7F', title:'262626', text:'404040', num:'808080', fontTitle:'Georgia', fontBody:'Calibri', decor: 'double-line' },
+  berlin:      { name:'Berlin',       bg:'FFFFFF', accent:'E21F26', title:'1A1A1A', text:'404040', num:'A6A6A6', fontTitle:'Arial', fontBody:'Arial', decor: 'left-stripe' },
+  celestial:   { name:'Celestial',    bg:'1B1130', accent:'B49BE0', title:'F2E9FF', text:'D3C6EC', num:'8D7BB0', fontTitle:'Georgia', fontBody:'Calibri', decor: 'top-bar' },
+  droplet:     { name:'Droplet',      bg:'E8F4FB', accent:'1F9BD1', title:'0B3E5C', text:'1F4E66', num:'5F8CA0', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'bottom-bar' },
+  headline:    { name:'Headline',     bg:'FFFFFF', accent:'002060', title:'002060', text:'333333', num:'808080', fontTitle:'Arial Black', fontBody:'Arial', decor: 'top-bar' },
+  linen:       { name:'Linen',        bg:'F5EFE6', accent:'A67C52', title:'3D2E1E', text:'5B4A34', num:'A08A70', fontTitle:'Georgia', fontBody:'Calibri', decor: 'double-line' },
+  mesh:        { name:'Mesh',         bg:'F0F0F0', accent:'5B9BD5', title:'1F3864', text:'404040', num:'8C8C8C', fontTitle:'Calibri', fontBody:'Calibri', decor: 'corner-shape' },
+  organic:     { name:'Organic',      bg:'F2F7EE', accent:'548235', title:'2E4A1F', text:'3E5A2E', num:'7F9A6F', fontTitle:'Georgia', fontBody:'Calibri', decor: 'left-stripe' },
+  savon:       { name:'Savon',        bg:'FFFFFF', accent:'B39DDB', title:'311B92', text:'4A3A78', num:'9585B5', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'top-bar' },
+  vivid:       { name:'Vivid',        bg:'FFFFFF', accent:'FF0066', title:'1A1A1A', text:'404040', num:'A6A6A6', fontTitle:'Impact', fontBody:'Calibri', decor: 'left-stripe' },
+  waves:       { name:'Waves',        bg:'0B2545', accent:'4BACC6', title:'FFFFFF', text:'C8DCE6', num:'7FA5B5', fontTitle:'Calibri Light', fontBody:'Calibri', decor: 'corner-shape' }
+};
+
+/* ---------- Применение темы PowerPoint к превью ---------- */
+function applyThemeToPreview(key){
+  const th = PPT_THEMES[key] || PPT_THEMES.office;
+  const root = document.documentElement;
+  root.style.setProperty('--slide-bg', '#' + th.bg);
+  root.style.setProperty('--slide-accent', '#' + th.accent);
+  root.style.setProperty('--slide-title', '#' + th.title);
+  root.style.setProperty('--slide-text', '#' + th.text);
+  root.style.setProperty('--slide-num', '#' + th.num);
+  root.style.setProperty('--slide-font-title', th.fontTitle + ', sans-serif');
+  root.style.setProperty('--slide-font-body', th.fontBody + ', sans-serif');
+}
+
+/* ---------- Генерация контента ---------- */
+const STYLE_TEMPLATES = {
+  business: {
+    intro: t => `Ключевые аспекты темы «${t}» и их влияние на бизнес-процессы.`,
+    outro: t => `Итоги по теме «${t}»: основные выводы и следующие шаги.`,
+    bullets: ['Определение и контекст','Текущее состояние и тренды','Ключевые метрики и показатели','Практические кейсы применения','Риски и возможности','Рекомендации и план действий']
+  },
+  educational: {
+    intro: t => `Базовое введение в тему «${t}»: что это и зачем изучать.`,
+    outro: t => `Обобщение по теме «${t}»: что запомнить и что изучить дальше.`,
+    bullets: ['Основные понятия и определения','История и предпосылки','Классификация и виды','Примеры и разбор ситуаций','Типичные ошибки','Практические задания и вопросы']
+  },
+  marketing: {
+    intro: t => `Почему тема «${t}» важна для аудитории и рынка.`,
+    outro: t => `Призыв к действию по теме «${t}» и ключевые сообщения.`,
+    bullets: ['Проблема аудитории','Наше решение и ценность','Целевая аудитория и сегменты','Конкурентные преимущества','Каналы продвижения','Оффер и следующие шаги']
+  },
+  technical: {
+    intro: t => `Технический обзор темы «${t}»: архитектура и принципы.`,
+    outro: t => `Выводы по теме «${t}»: ограничения, метрики и дальнейшая работа.`,
+    bullets: ['Архитектура и компоненты','Принципы работы','Технологический стек','Метрики производительности','Ограничения и узкие места','Направления развития']
+  }
+};
+const pick = (arr,i) => arr[i % arr.length];
+
+function generateSlides(topic, count, styleKey){
+  const tpl = STYLE_TEMPLATES[styleKey] || STYLE_TEMPLATES.business;
+  const slides = [];
+  slides.push({ title: topic, body: [tpl.intro(topic)] });
+  const inner = Math.max(0, count - 2);
+  for (let i = 0; i < inner; i++){
+    const bullet = pick(tpl.bullets, i);
+    slides.push({
+      title: `${i + 2}. ${bullet}`,
+      body: [
+        `• ${bullet}`,
+        `• Подробное раскрытие пункта «${bullet}» в контексте темы «${topic}».`,
+        `• Ключевой тезис ${i + 1}: практическое значение и пример.`
+      ]
+    });
+  }
+  if (count > 1) slides.push({ title:'Заключение', body:[tpl.outro(topic)] });
+  return slides.slice(0, count);
+}
+
+/* ---------- Отрисовка превью ---------- */
+function renderSlides(){
+  const c = $('slides');
+  if (!state.slides.length){
+    c.innerHTML = '<div class="empty">Презентация пуста.</div>';
+    return;
+  }
+  c.innerHTML = state.slides.map((s,i) => `
+    <div class="slide">
+      <div class="slide-num">СЛАЙД ${i+1} / ${state.slides.length}</div>
+      <div class="slide-title">${escapeHtml(s.title)}</div>
+      <div class="slide-body">${s.body.map(escapeHtml).join('\n')}</div>
+    </div>
+  `).join('');
+}
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ---------- Правки (с поддержкой удаления) ---------- */
+function applyRevision(text){
+  const lower = text.toLowerCase();
+  const slides = state.slides;
+  if (!slides.length) return;
+
+  const isDelete = /убери|удали|удалить|сотри|стереть|убрать|исключи|исключить|remove|delete/i.test(lower);
+
+  if (isDelete) {
+    const slideMatch = text.match(/слайд[а-я]*\s*(\d+)/i);
+    if (slideMatch) {
+      const idx = Number(slideMatch[1]) - 1;
+      if (idx >= 0 && idx < slides.length) slides.splice(idx, 1);
+    } else {
+      let targetText = '';
+      const quoteMatch = text.match(/["«'](.*?)["»']/);
+      if (quoteMatch) {
+        targetText = quoteMatch[1].toLowerCase();
+      } else {
+        const aboutMatch = text.match(/(?:про|о|об|пункт|строку|текст)\s+(.+)/i);
+        if (aboutMatch) targetText = aboutMatch[1].trim().toLowerCase();
+      }
+
+      if (targetText) {
+        let deletedAny = false;
+        slides.forEach(s => {
+          const originalLength = s.body.length;
+          s.body = s.body.filter(line => !line.toLowerCase().includes(targetText));
+          if (s.body.length < originalLength) deletedAny = true;
+        });
+        if (!deletedAny) {
+           slides.forEach(s => {
+             const originalLength = s.body.length;
+             const words = targetText.split(' ').filter(w => w.length > 3);
+             s.body = s.body.filter(line => {
+                const lowerLine = line.toLowerCase();
+                return !words.some(w => lowerLine.includes(w));
+             });
+             if (s.body.length < originalLength) deletedAny = true;
+           });
+        }
+      } else {
+        const lastSlide = slides[slides.length - 1];
+        if (lastSlide.body.length > 1) lastSlide.body.pop();
+      }
+    }
+  } else {
+    const slideMatches = [...text.matchAll(/слайд[а-я]*\s*(\d+)/gi)];
+    const targets = slideMatches.length
+      ? [...new Set(slideMatches.map(m => Number(m[1]) - 1))].filter(n => n >= 0 && n < slides.length)
+      : slides.map((_, i) => i);
+    const shorten = /короче|сократ|убрать лишн|кратк/i.test(lower);
+    const addExample = /пример|добавь|дополни/i.test(lower);
+    const rewriteTitle = /заголов|перепиши|переимен/i.test(lower);
+    targets.forEach(idx => {
+      const s = slides[idx];
+      if (shorten) s.body = s.body.slice(0, Math.max(1, Math.ceil(s.body.length / 2)));
+      if (addExample) s.body.push('• Пример: конкретная ситуация, иллюстрирующая этот тезис.');
+      if (rewriteTitle) s.title = `${s.title.replace(/^\d+\.\s*/, '')} — обновлённая формулировка`;
+      if (!shorten && !addExample && !rewriteTitle) s.body.push(`• Уточнение: ${text}`);
+    });
+  }
+  renderSlides();
+}
+
+/* ---------- Экспорт в PPTX ---------- */
+async function exportPptx(){
+  if (!state.slides.length) return;
+  if (typeof PptxGenJS === 'undefined'){
+    throw new Error('Библиотека PptxGenJS не загрузилась. Проверьте доступ к cdn.jsdelivr.net.');
+  }
+  const th = PPT_THEMES[state.theme] || PPT_THEMES.office;
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_16x9';
+
+  state.slides.forEach((s, i) => {
+    const slide = pptx.addSlide();
+    slide.background = { color: th.bg };
+
+    if (th.decor === 'left-stripe') {
+      slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:0.15, h:'100%', fill:{ color: th.accent }, line:{ color: th.accent } });
+    } else if (th.decor === 'top-bar') {
+      slide.addShape(pptx.ShapeType.rect, { x:0, y:0, w:'100%', h:0.4, fill:{ color: th.accent }, line:{ color: th.accent } });
+    } else if (th.decor === 'bottom-bar') {
+      slide.addShape(pptx.ShapeType.rect, { x:0, y:5.2, w:'100%', h:0.3, fill:{ color: th.accent }, line:{ color: th.accent } });
+    } else if (th.decor === 'corner-shape') {
+      slide.addShape(pptx.ShapeType.rect, { x:8.5, y:4.5, w:1.5, h:1.5, fill:{ color: th.accent }, line:{ color: th.accent }, rotate: 45 });
+    } else if (th.decor === 'double-line') {
+      slide.addShape(pptx.ShapeType.rect, { x:0.5, y:0.3, w:9, h:0.02, fill:{ color: th.accent }, line:{ color: th.accent } });
+      slide.addShape(pptx.ShapeType.rect, { x:0.5, y:0.35, w:9, h:0.02, fill:{ color: th.accent }, line:{ color: th.accent } });
+    }
+
+    slide.addText(`СЛАЙД ${i+1} / ${state.slides.length}`, {
+      x:0.5, y:0.3, w:6, h:0.3, fontSize:10, color: th.num, bold:true, fontFace: th.fontBody, charSpacing:1.5
+    });
+    slide.addText(s.title, {
+      x:0.5, y:0.7, w:9, h:1.2, fontSize:28, bold:true, color: th.title, fontFace: th.fontTitle, valign:'top'
+    });
+    slide.addText(s.body.join('\n'), {
+      x:0.5, y:2.1, w:9, h:3.2, fontSize:16, color: th.text, fontFace: th.fontBody, valign:'top', lineSpacing:24
+    });
+  });
+
+  const topicSafe = (state.topic || 'presentation')
+    .replace(/[^\wа-яё\s-]/gi,'').trim().replace(/\s+/g,'_').slice(0,60) || 'presentation';
+  await pptx.writeFile({ fileName: `HIPIND_${topicSafe}.pptx` });
+}
+
+/* ---------- Обработчики ---------- */
+$('theme').addEventListener('change', e => {
+  applyThemeToPreview(e.target.value);
+  if (state.slides.length) renderSlides();
+});
+
+$('generateBtn').addEventListener('click', () => {
+  const topic = $('topic').value.trim();
+  const count = Math.max(1, Math.min(50, Number($('slideCount').value) || 5));
+  const contentStyle = $('contentStyle').value;
+  const theme = $('theme').value;
+  if (!topic){
+    genStatus.textContent = 'Укажите тему презентации.';
+    genStatus.className = 'status err';
+    return;
+  }
+  state.topic = topic;
+  state.contentStyle = contentStyle;
+  state.theme = theme;
+  applyThemeToPreview(theme);
+  state.slides = generateSlides(topic, count, contentStyle);
+  renderSlides();
+  $('revision').disabled = false;
+  $('applyBtn').disabled = false;
+  $('downloadBtn').disabled = false;
+  genStatus.textContent = `Готово: ${state.slides.length} слайд(ов), тема «${PPT_THEMES[theme].name}».`;
+  genStatus.className = 'status ok';
+  revStatus.textContent = '';
+});
+
+$('applyBtn').addEventListener('click', () => {
+  const text = $('revision').value.trim();
+  if (!text){
+    revStatus.textContent = 'Введите правки.';
+    revStatus.className = 'status err';
+    return;
+  }
+  applyRevision(text);
+  revStatus.textContent = 'Правки применены.';
+  revStatus.className = 'status ok';
+  $('revision').value = '';
+});
+
+$('downloadBtn').addEventListener('click', async () => {
+  const btn = $('downloadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Подготовка файла…';
+  try {
+    await exportPptx();
+    btn.textContent = 'Скачать .pptx';
+    btn.disabled = false;
+  } catch (e){
+    console.error(e);
+    alert('Ошибка экспорта: ' + (e && e.message ? e.message : e));
+    btn.textContent = 'Ошибка — повторить';
+    btn.disabled = false;
+  }
+});
+
+/* Стартовая инициализация */
+applyThemeToPreview(state.theme);
+</script>
+</body>
+</html>
