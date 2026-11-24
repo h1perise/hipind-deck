@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HIPIND Deck</title>
+<title>HIPIND Deck — Real Search</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230f1115'/%3E%3Crect x='24' y='24' width='132' height='132' rx='28' stroke='%23ffffff' stroke-width='10' transform='rotate(45 90 90)' fill='none'/%3E%3Crect x='44' y='44' width='92' height='92' rx='16' fill='%23ffffff' transform='rotate(45 90 90)'/%3E%3Cpath d='M70 68 V112 M110 68 V112 M70 90 H110' stroke='%230f1115' stroke-width='9' stroke-linecap='square'/%3E%3Cpath d='M120 68 V112 H130 C141 112 148 104 148 90 C148 76 141 68 130 68 H120' stroke='%230f1115' stroke-width='9' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
 <style>
   :root {
@@ -43,21 +43,12 @@
   .slide-title { font-family: var(--slide-font-title); font-size:22px; font-weight:700; margin-bottom:14px; line-height:1.25; color:var(--slide-title); }
   .slide-body { font-family: var(--slide-font-body); font-size:14px; line-height:1.65; color:var(--slide-text); white-space:pre-wrap; }
   .empty { color:var(--ui-muted); text-align:center; padding:60px 20px; font-size:14px; line-height:1.7; }
-  .status { font-size:12px; color:var(--ui-muted); margin-top:10px; }
+  .status { font-size:12px; color:var(--ui-muted); margin-top:10px; white-space:pre-wrap; }
   .status.ok { color:#3ecf8e; } .status.err { color:#ff6b6b; }
   .theme-toggle { position:fixed; top:16px; right:16px; z-index:100; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--ui-panel); color:var(--ui-text); border:1px solid var(--ui-border); font-size:18px; line-height:1; padding:0; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: background .2s, color .2s, border-color .2s, transform .15s; }
   .theme-toggle:hover { transform: scale(1.05); filter:none; }
 
-  /* --- Пузырёк пользователя --- */
-  .user-bubble {
-    position: fixed; top: 8px; left: 16px; z-index: 100;
-    display: flex; align-items: center; gap: 8px;
-    background: var(--ui-panel); border: 1px solid var(--ui-border);
-    border-radius: 999px; padding: 6px 12px 6px 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    transition: background .2s, border-color .2s;
-    font-size: 13px;
-  }
+  .user-bubble { position: fixed; top: 8px; left: 16px; z-index: 100; display: flex; align-items: center; gap: 8px; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 999px; padding: 6px 12px 6px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: background .2s, border-color .2s; font-size: 13px; }
   .user-bubble .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ui-field); border: 1px solid var(--ui-border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--ui-muted); overflow: hidden; flex-shrink: 0; }
   .user-bubble .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .user-bubble .nick { font-weight: 600; color: var(--ui-text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -68,29 +59,11 @@
   .user-bubble .auth-btn.ghost { background: transparent; color: var(--ui-text); border: 1px solid var(--ui-border); }
   .user-bubble .auth-btn.ghost:hover { background: var(--ui-field); }
 
-  /* --- Пузырёк «Проекты» --- */
-  .projects-bubble {
-    position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 100;
-    background: var(--ui-panel); border: 1px solid var(--ui-border);
-    border-radius: 999px; padding: 6px 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    display: flex; align-items: center; gap: 8px;
-    cursor: pointer; font-size: 13px; font-weight: 600;
-    color: var(--ui-text);
-    transition: background .2s, border-color .2s, transform .15s;
-  }
+  .projects-bubble { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 100; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 999px; padding: 6px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ui-text); transition: background .2s, border-color .2s, transform .15s; }
   .projects-bubble:hover { filter: brightness(1.03); transform: translateX(-50%) translateY(-1px); }
   .projects-bubble .icon { font-size: 15px; }
 
-  /* --- Панель проектов --- */
-  .projects-panel {
-    position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-    z-index: 150; width: 92%; max-width: 560px;
-    background: var(--ui-panel); border: 1px solid var(--ui-border);
-    border-radius: 16px; padding: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    display: none; max-height: 70vh; overflow-y: auto;
-  }
+  .projects-panel { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 150; width: 92%; max-width: 560px; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: none; max-height: 70vh; overflow-y: auto; }
   .projects-panel.show { display: block; }
   .projects-panel h3 { font-size: 15px; margin-bottom: 10px; color: var(--ui-text); }
   .projects-list { display: flex; flex-direction: column; gap: 8px; }
@@ -104,7 +77,6 @@
   .projects-msg { font-size: 12px; color: #ff6b6b; margin-top: 8px; }
   .projects-msg.ok { color: #3ecf8e; }
 
-  /* --- Модальные окна --- */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.show { display: flex; }
   .modal { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); color: var(--ui-text); }
@@ -178,6 +150,7 @@
         </svg>
         <h1 style="margin:0;">HIPIND Deck</h1>
       </div>
+
       <label for="topic">Тема презентации</label>
       <input id="topic" type="text" placeholder="Например: Введение в машинное обучение">
       <label for="slideCount">Количество слайдов</label>
@@ -203,6 +176,7 @@
         <option value="savon">Savon (Мыло)</option><option value="vivid">Vivid (Розовый)</option>
         <option value="waves">Waves (Волны)</option>
       </select>
+
       <button class="btn-primary" id="generateBtn">Сгенерировать презентацию</button>
       <div class="status" id="genStatus"></div>
     </div>
@@ -220,12 +194,11 @@
       <button class="btn-download" id="downloadBtn" disabled>Скачать .pptx</button>
     </div>
     <div class="slides" id="slides">
-      <div class="empty">Презентация ещё не создана.<br>Укажите тему и количество слайдов, затем нажмите «Сгенерировать презентацию».</div>
+      <div class="empty">Презентация ещё не создана.<br>Введите тему и нажмите «Сгенерировать презентацию».</div>
     </div>
   </div>
 </div>
 
-<!-- Модалка авторизации -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-wrap">
     <div class="modal">
@@ -248,7 +221,6 @@
   </div>
 </div>
 
-<!-- Модалка удаления аккаунта -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-wrap">
     <div class="modal">
@@ -265,84 +237,35 @@
 </div>
 
 <script>
-/* ======================== Переменные ======================== */
+/* ======================== Хранилище ======================== */
 const STORAGE_USERS = 'hipind_users_v1';
 const STORAGE_SESSION = 'hipind_session_v1';
 const STORAGE_PROJECTS = 'hipind_projects_v1';
 
-/* USERS: { nickLower: { nick, passHash, avatar } } */
 let USERS = {};
-
-/* PROJECTS: { nickLower: [ { title, topic, theme, contentStyle, slides, date } ] }
-   Проекты привязаны к аккаунту по нику в нижнем регистре. */
 let PROJECTS = {};
 
-function loadUsers() {
-  try { USERS = JSON.parse(localStorage.getItem(STORAGE_USERS) || '{}'); }
-  catch(e) { USERS = {}; }
-}
-function saveUsers() {
-  try { localStorage.setItem(STORAGE_USERS, JSON.stringify(USERS)); } catch(e) {}
-}
-function loadAllProjects() {
-  try { PROJECTS = JSON.parse(localStorage.getItem(STORAGE_PROJECTS) || '{}'); }
-  catch(e) { PROJECTS = {}; }
-}
-function saveAllProjects() {
-  try { localStorage.setItem(STORAGE_PROJECTS, JSON.stringify(PROJECTS)); } catch(e) {}
-}
-
-function getSession() {
-  try { return localStorage.getItem(STORAGE_SESSION); } catch(e) { return null; }
-}
-function setSession(nick) {
-  try {
-    if (nick) localStorage.setItem(STORAGE_SESSION, nick);
-    else localStorage.removeItem(STORAGE_SESSION);
-  } catch(e) {}
-}
-function hashPassword(pass) {
-  let h = 0;
-  for (let i = 0; i < pass.length; i++) { h = ((h << 5) - h) + pass.charCodeAt(i); h |= 0; }
-  return 'h' + Math.abs(h).toString(36);
-}
+function loadUsers() { try { USERS = JSON.parse(localStorage.getItem(STORAGE_USERS) || '{}'); } catch(e) { USERS = {}; } }
+function saveUsers() { try { localStorage.setItem(STORAGE_USERS, JSON.stringify(USERS)); } catch(e) {} }
+function loadAllProjects() { try { PROJECTS = JSON.parse(localStorage.getItem(STORAGE_PROJECTS) || '{}'); } catch(e) { PROJECTS = {}; } }
+function saveAllProjects() { try { localStorage.setItem(STORAGE_PROJECTS, JSON.stringify(PROJECTS)); } catch(e) {} }
+function getSession() { try { return localStorage.getItem(STORAGE_SESSION); } catch(e) { return null; } }
+function setSession(nick) { try { if (nick) localStorage.setItem(STORAGE_SESSION, nick); else localStorage.removeItem(STORAGE_SESSION); } catch(e) {} }
+function hashPassword(pass) { let h = 0; for (let i = 0; i < pass.length; i++) { h = ((h << 5) - h) + pass.charCodeAt(i); h |= 0; } return 'h' + Math.abs(h).toString(36); }
 
 let currentUser = null;
 
 /* ---------- Проекты ---------- */
-function getUserProjects() {
-  if (!currentUser) return [];
-  return PROJECTS[currentUser.nick.toLowerCase()] || [];
-}
-function saveUserProjects(list) {
-  if (!currentUser) return false;
-  PROJECTS[currentUser.nick.toLowerCase()] = list;
-  try { saveAllProjects(); return true; }
-  catch(e) { console.warn('Не удалось сохранить проекты:', e); return false; }
-}
-function addProject(project) {
-  if (!currentUser) return false;
-  const list = getUserProjects();
-  list.unshift(project);
-  return saveUserProjects(list.slice(0, 30));
-}
+function getUserProjects() { if (!currentUser) return []; return PROJECTS[currentUser.nick.toLowerCase()] || []; }
+function saveUserProjects(list) { if (!currentUser) return false; PROJECTS[currentUser.nick.toLowerCase()] = list; try { saveAllProjects(); return true; } catch(e) { return false; } }
+function addProject(project) { if (!currentUser) return false; const list = getUserProjects(); list.unshift(project); return saveUserProjects(list.slice(0, 30)); }
 function renderProjects() {
   const listEl = document.getElementById('projectsList');
   const msgEl = document.getElementById('projectsMsg');
-  msgEl.textContent = '';
-  msgEl.className = 'projects-msg';
-
-  if (!currentUser) {
-    listEl.innerHTML = '<div class="projects-empty">Войдите в аккаунт, чтобы видеть свои проекты.</div>';
-    return;
-  }
-
+  msgEl.textContent = ''; msgEl.className = 'projects-msg';
+  if (!currentUser) { listEl.innerHTML = '<div class="projects-empty">Войдите в аккаунт, чтобы видеть свои проекты.</div>'; return; }
   const projects = getUserProjects();
-  if (!projects.length) {
-    listEl.innerHTML = '<div class="projects-empty">Пока нет сохранённых проектов. Сгенерируйте презентацию — она появится здесь.</div>';
-    return;
-  }
-
+  if (!projects.length) { listEl.innerHTML = '<div class="projects-empty">Пока нет сохранённых проектов.</div>'; return; }
   listEl.innerHTML = projects.map((p, i) => `
     <div class="project-item">
       <div class="meta">
@@ -353,185 +276,93 @@ function renderProjects() {
         <button class="dl-btn" data-project-index="${i}">Скачать</button>
         <button class="del-btn" data-delete-index="${i}">✕</button>
       </div>
-    </div>
-  `).join('');
-
-  listEl.querySelectorAll('.dl-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = Number(btn.getAttribute('data-project-index'));
-      downloadProject(idx);
-    });
-  });
-  listEl.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = Number(btn.getAttribute('data-delete-index'));
-      deleteProject(idx);
-    });
-  });
+    </div>`).join('');
+  listEl.querySelectorAll('.dl-btn').forEach(btn => btn.addEventListener('click', () => downloadProject(Number(btn.getAttribute('data-project-index')))));
+  listEl.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteProject(Number(btn.getAttribute('data-delete-index')))));
 }
 function toggleProjectsPanel() {
   const panel = document.getElementById('projectsPanel');
   if (!currentUser) {
     panel.classList.remove('show');
-    document.getElementById('loginBtn').style.boxShadow = '0 0 0 3px rgba(79,124,255,0.4)';
-    setTimeout(() => { document.getElementById('loginBtn').style.boxShadow = ''; }, 1200);
+    const b = document.getElementById('loginBtn');
+    b.style.boxShadow = '0 0 0 3px rgba(79,124,255,0.4)';
+    setTimeout(() => { b.style.boxShadow = ''; }, 1200);
     return;
   }
-  if (panel.classList.contains('show')) {
-    panel.classList.remove('show');
-  } else {
-    renderProjects();
-    panel.classList.add('show');
-  }
+  if (panel.classList.contains('show')) panel.classList.remove('show');
+  else { renderProjects(); panel.classList.add('show'); }
 }
 async function downloadProject(idx) {
   if (!currentUser) return;
-  const projects = getUserProjects();
-  const p = projects[idx];
-  if (!p) return;
-
-  const prevSlides = state.slides;
-  const prevTopic = state.topic;
-  const prevTheme = state.theme;
-  const prevContentStyle = state.contentStyle;
-
-  state.slides = p.slides;
-  state.topic = p.topic;
-  state.theme = p.theme;
-  state.contentStyle = p.contentStyle || 'business';
-
-  try {
-    await exportPptx();
-  } finally {
-    state.slides = prevSlides;
-    state.topic = prevTopic;
-    state.theme = prevTheme;
-    state.contentStyle = prevContentStyle;
-  }
+  const p = getUserProjects()[idx]; if (!p) return;
+  const prev = { slides: state.slides, topic: state.topic, theme: state.theme, contentStyle: state.contentStyle };
+  state.slides = p.slides; state.topic = p.topic; state.theme = p.theme; state.contentStyle = p.contentStyle || 'business';
+  try { await exportPptx(); } finally { Object.assign(state, prev); }
 }
-function deleteProject(idx) {
-  if (!currentUser) return;
-  const list = getUserProjects();
-  list.splice(idx, 1);
-  saveUserProjects(list);
-  renderProjects();
-}
+function deleteProject(idx) { if (!currentUser) return; const list = getUserProjects(); list.splice(idx, 1); saveUserProjects(list); renderProjects(); }
 
 /* ---------- Авторизация ---------- */
 function showAuthModal(mode) {
   const modal = document.getElementById('authModal');
-  const title = document.getElementById('authTitle');
-  const subtitle = document.getElementById('authSubtitle');
-  const submit = document.getElementById('authSubmitBtn');
-  const msg = document.getElementById('authMsg');
-  const passInput = document.getElementById('authPass');
-  const passToggle = document.getElementById('passToggle');
-
   modal.dataset.mode = mode;
-  msg.textContent = '';
-  msg.className = 'msg';
+  document.getElementById('authMsg').textContent = '';
+  document.getElementById('authMsg').className = 'msg';
   document.getElementById('authNick').value = '';
-  passInput.value = '';
-  passInput.type = 'password';
-  passToggle.textContent = '👁';
-  passToggle.setAttribute('aria-label', 'Показать пароль');
-
+  const passInput = document.getElementById('authPass');
+  passInput.value = ''; passInput.type = 'password';
+  const pt = document.getElementById('passToggle');
+  pt.textContent = '👁'; pt.setAttribute('aria-label', 'Показать пароль');
   if (mode === 'register') {
-    title.textContent = 'Регистрация';
-    subtitle.textContent = 'Придумайте никнейм и пароль';
-    submit.textContent = 'Зарегистрироваться';
+    document.getElementById('authTitle').textContent = 'Регистрация';
+    document.getElementById('authSubtitle').textContent = 'Придумайте никнейм и пароль';
+    document.getElementById('authSubmitBtn').textContent = 'Зарегистрироваться';
   } else {
-    title.textContent = 'Вход';
-    subtitle.textContent = 'Введите никнейм и пароль';
-    submit.textContent = 'Войти';
+    document.getElementById('authTitle').textContent = 'Вход';
+    document.getElementById('authSubtitle').textContent = 'Введите никнейм и пароль';
+    document.getElementById('authSubmitBtn').textContent = 'Войти';
   }
-
   modal.classList.add('show');
   setTimeout(() => document.getElementById('authNick').focus(), 50);
 }
 function hideAuthModal() { document.getElementById('authModal').classList.remove('show'); }
-
 function submitAuth() {
   const modal = document.getElementById('authModal');
   const mode = modal.dataset.mode || 'login';
   const nick = (document.getElementById('authNick').value || '').trim();
   const pass = (document.getElementById('authPass').value || '');
   const msg = document.getElementById('authMsg');
-
-  msg.className = 'msg';
-  msg.textContent = '';
-
-  if (!nick || nick.length < 3) {
-    msg.className = 'msg err';
-    msg.textContent = 'Никнейм должен быть не короче 3 символов.';
-    return;
-  }
-  if (!pass || pass.length < 4) {
-    msg.className = 'msg err';
-    msg.textContent = 'Пароль должен быть не короче 4 символов.';
-    return;
-  }
-
+  msg.className = 'msg'; msg.textContent = '';
+  if (!nick || nick.length < 3) { msg.className = 'msg err'; msg.textContent = 'Никнейм должен быть не короче 3 символов.'; return; }
+  if (!pass || pass.length < 4) { msg.className = 'msg err'; msg.textContent = 'Пароль должен быть не короче 4 символов.'; return; }
   const key = nick.toLowerCase();
-
   if (mode === 'register') {
-    if (USERS[key]) {
-      msg.className = 'msg err';
-      msg.textContent = 'Никнейм уже занят. Выберите другой.';
-      return;
-    }
+    if (USERS[key]) { msg.className = 'msg err'; msg.textContent = 'Никнейм уже занят.'; return; }
     USERS[key] = { nick, passHash: hashPassword(pass), avatar: '' };
-    saveUsers();
-    setSession(nick);
-    currentUser = { nick, avatar: '' };
-    msg.className = 'msg ok';
-    msg.textContent = 'Регистрация успешна!';
+    saveUsers(); setSession(nick); currentUser = { nick, avatar: '' };
+    msg.className = 'msg ok'; msg.textContent = 'Регистрация успешна!';
     setTimeout(() => { hideAuthModal(); updateBubble(); }, 400);
   } else {
     const user = USERS[key];
-    if (!user) {
-      msg.className = 'msg err';
-      msg.textContent = 'Пользователь не найден.';
-      return;
-    }
-    if (user.passHash !== hashPassword(pass)) {
-      msg.className = 'msg err';
-      msg.textContent = 'Неверный пароль.';
-      return;
-    }
-    setSession(user.nick);
-    currentUser = { nick: user.nick, avatar: user.avatar || '' };
-    msg.className = 'msg ok';
-    msg.textContent = 'Вход выполнен.';
+    if (!user) { msg.className = 'msg err'; msg.textContent = 'Пользователь не найден.'; return; }
+    if (user.passHash !== hashPassword(pass)) { msg.className = 'msg err'; msg.textContent = 'Неверный пароль.'; return; }
+    setSession(user.nick); currentUser = { nick: user.nick, avatar: user.avatar || '' };
+    msg.className = 'msg ok'; msg.textContent = 'Вход выполнен.';
     setTimeout(() => { hideAuthModal(); updateBubble(); }, 300);
   }
 }
-
-function logout() {
-  setSession(null);
-  currentUser = null;
-  updateBubble();
-  document.getElementById('projectsPanel').classList.remove('show');
-}
-
+function logout() { setSession(null); currentUser = null; updateBubble(); document.getElementById('projectsPanel').classList.remove('show'); }
 function updateBubble() {
   const guest = document.getElementById('bubbleGuest');
   const user = document.getElementById('bubbleUser');
   const nickEl = document.getElementById('userNick');
   const avatarEl = document.getElementById('userAvatar');
-
   if (currentUser) {
-    guest.style.display = 'none';
-    user.style.display = 'flex';
+    guest.style.display = 'none'; user.style.display = 'flex';
     nickEl.textContent = currentUser.nick;
     if (currentUser.avatar) avatarEl.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
     else avatarEl.textContent = currentUser.nick.charAt(0).toUpperCase();
-  } else {
-    guest.style.display = 'flex';
-    user.style.display = 'none';
-  }
+  } else { guest.style.display = 'flex'; user.style.display = 'none'; }
 }
-
 function restoreSession() {
   const nick = getSession();
   if (!nick) { updateBubble(); return; }
@@ -543,50 +374,28 @@ function restoreSession() {
 
 /* ---------- Удаление аккаунта ---------- */
 let deleteTimerInterval = null;
-let deleteCountdown = 10;
-
 function showDeleteModal() {
   if (!currentUser) return;
   document.getElementById('deleteMsg').textContent = '';
-  document.getElementById('deleteMsg').className = 'msg';
   document.getElementById('deleteModal').classList.add('show');
-
-  deleteCountdown = 10;
+  let n = 10;
   const btn = document.getElementById('deleteConfirmBtn');
-  btn.disabled = true;
-  btn.textContent = `Подтвердить (${deleteCountdown})`;
-
+  btn.disabled = true; btn.textContent = `Подтвердить (${n})`;
   if (deleteTimerInterval) clearInterval(deleteTimerInterval);
   deleteTimerInterval = setInterval(() => {
-    deleteCountdown--;
-    if (deleteCountdown <= 0) {
-      clearInterval(deleteTimerInterval);
-      deleteTimerInterval = null;
-      btn.disabled = false;
-      btn.textContent = 'Подтвердить';
-    } else {
-      btn.textContent = `Подтвердить (${deleteCountdown})`;
-    }
+    n--;
+    if (n <= 0) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; btn.disabled = false; btn.textContent = 'Подтвердить'; }
+    else btn.textContent = `Подтвердить (${n})`;
   }, 1000);
 }
-function hideDeleteModal() {
-  document.getElementById('deleteModal').classList.remove('show');
-  if (deleteTimerInterval) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; }
-}
+function hideDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); if (deleteTimerInterval) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; } }
 function confirmDeleteAccount() {
   if (!currentUser) return;
-  const btn = document.getElementById('deleteConfirmBtn');
-  if (btn.disabled) return;
-
+  if (document.getElementById('deleteConfirmBtn').disabled) return;
   const key = currentUser.nick.toLowerCase();
-  delete USERS[key];
-  delete PROJECTS[key];  // удаляем и проекты этого пользователя
-  saveUsers();
-  saveAllProjects();
-  setSession(null);
-  currentUser = null;
-  updateBubble();
-  hideDeleteModal();
+  delete USERS[key]; delete PROJECTS[key];
+  saveUsers(); saveAllProjects(); setSession(null); currentUser = null;
+  updateBubble(); hideDeleteModal();
 }
 
 /* ======================== Приложение ======================== */
@@ -627,25 +436,63 @@ const PPT_THEMES = {
 };
 function getTheme(key){ return PPT_THEMES[key] || PPT_THEMES.office; }
 function applyThemeToPreview(key){const th=getTheme(key);const r=document.documentElement;r.style.setProperty('--slide-bg','#'+th.bg);r.style.setProperty('--slide-accent','#'+th.accent);r.style.setProperty('--slide-title','#'+th.title);r.style.setProperty('--slide-text','#'+th.text);r.style.setProperty('--slide-num','#'+th.num);r.style.setProperty('--slide-font-title',th.fontTitle+', sans-serif');r.style.setProperty('--slide-font-body',th.fontBody+', sans-serif');}
-const STYLE_TEMPLATES = {
-  business:{intro:t=>`Ключевые аспекты темы «${t}» и их влияние на бизнес-процессы.`,outro:t=>`Итоги по теме «${t}»: основные выводы и следующие шаги.`,bullets:['Определение и контекст','Текущее состояние и тренды','Ключевые метрики и показатели','Практические кейсы применения','Риски и возможности','Рекомендации и план действий']},
-  educational:{intro:t=>`Базовое введение в тему «${t}»: что это и зачем изучать.`,outro:t=>`Обобщение по теме «${t}»: что запомнить и что изучить дальше.`,bullets:['Основные понятия и определения','История и предпосылки','Классификация и виды','Примеры и разбор ситуаций','Типичные ошибки','Практические задания и вопросы']},
-  marketing:{intro:t=>`Почему тема «${t}» важна для аудитории и рынка.`,outro:t=>`Призыв к действию по теме «${t}» и ключевые сообщения.`,bullets:['Проблема аудитории','Наше решение и ценность','Целевая аудитория и сегменты','Конкурентные преимущества','Каналы продвижения','Оффер и следующие шаги']},
-  technical:{intro:t=>`Технический обзор темы «${t}»: архитектура и принципы.`,outro:t=>`Выводы по теме «${t}»: ограничения, метрики и дальнейшая работа.`,bullets:['Архитектура и компоненты','Принципы работы','Технологический стек','Метрики производительности','Ограничения и узкие места','Направления развития']}
-};
-const pick=(a,i)=>a[i%a.length];
-function generateSlides(topic,count,styleKey){
-  const tpl=STYLE_TEMPLATES[styleKey]||STYLE_TEMPLATES.business;
-  const slides=[];
-  slides.push({title:topic, body:[tpl.intro(topic)], isIntro:true});
-  const inner=Math.max(0,count-2);
-  for(let i=0;i<inner;i++){
-    const b=pick(tpl.bullets,i);
-    slides.push({title:`${i+1}. ${b}`, body:[`• ${b}`,`• Подробное раскрытие пункта «${b}» в контексте темы «${topic}».`,`• Ключевой тезис ${i+1}: практическое значение и пример.`]});
-  }
-  if(count>1)slides.push({title:'Заключение',body:[tpl.outro(topic)]});
-  return slides.slice(0,count);
+
+/* ---------- Реальный поиск через DuckDuckGo JSONP ---------- */
+function jsonpRequest(url, callbackName = 'ddgCallback') {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      resolve(data);
+    };
+    script.onerror = () => {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      reject(new Error('Не удалось загрузить данные из DuckDuckGo.'));
+    };
+    script.src = url + '&callback=' + callbackName;
+    document.body.appendChild(script);
+  });
 }
+
+async function searchDuckDuckGo(topic) {
+  const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(topic) + '&format=json&no_html=1&skip_disambig=1';
+  const data = await jsonpRequest(url);
+  const facts = [];
+  if (data.AbstractText) facts.push(data.AbstractText);
+  if (data.Answer) facts.push(data.Answer);
+  if (Array.isArray(data.RelatedTopics)) {
+    data.RelatedTopics.slice(0, 8).forEach(item => {
+      if (item.Text) facts.push(item.Text);
+      if (Array.isArray(item.Topics)) {
+        item.Topics.slice(0, 3).forEach(sub => { if (sub.Text) facts.push(sub.Text); });
+      }
+    });
+  }
+  return facts;
+}
+
+function buildSlidesFromFacts(topic, count, facts) {
+  const slides = [];
+  const intro = facts[0] || 'Информация по теме «' + topic + '» не найдена.';
+  slides.push({ title: topic, body: [intro], isIntro: true });
+
+  const innerCount = Math.max(0, count - 2);
+  for (let i = 0; i < innerCount; i++) {
+    const fact = facts[i + 1] || facts[(i + 1) % Math.max(1, facts.length)];
+    slides.push({
+      title: 'Факт ' + (i + 1),
+      body: ['• ' + (fact || 'Данных по этому пункту нет.')]
+    });
+  }
+  if (count > 1) {
+    const lastFact = facts[facts.length - 1] || 'Итоги по теме.';
+    slides.push({ title: 'Заключение', body: ['• ' + lastFact] });
+  }
+  return slides.slice(0, count);
+}
+
 function renderSlides(){const c=$('slides');if(!state.slides.length){c.innerHTML='<div class="empty">Презентация пуста.</div>';return;}c.innerHTML=state.slides.map((s,i)=>`<div class="slide"><div class="slide-title">${escapeHtml(s.title)}</div><div class="slide-body">${s.body.map(escapeHtml).join('\n')}</div></div>`).join('');}
 function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
@@ -654,8 +501,7 @@ function getTargetIndices(slides, text){
   if (!matches.length) return slides.map((_, i) => i);
   const result = new Set();
   matches.forEach(m => {
-    const num = Number(m[1]);
-    let counter = 0;
+    const num = Number(m[1]); let counter = 0;
     for (let i = 0; i < slides.length; i++) {
       if (slides[i].isIntro) continue;
       counter++;
@@ -664,74 +510,45 @@ function getTargetIndices(slides, text){
   });
   return [...result].filter(n => n >= 0 && n < slides.length);
 }
-
 function extractWords(text){
-  const STOP = ['убери','удали','удалить','сотри','стереть','убрать','исключи','исключить',
-                'remove','delete','слайд','слайда','слайде','слайдов','слайды',
-                'строку','строка','строки','строк','пункт','пункта','пункты','пунктов',
-                'текст','текста','тексты','текстов',
-                'про','об','о','это','этот','эту','эти','тот','та','те',
-                'из','на','в','во','с','со','и','а','но','или','для','по','который','которая','которые'];
-  let cleaned = text.toLowerCase()
-    .replace(/слайд[а-я]*\s*\d+/gi, ' ')
-    .replace(/[«»"'()\[\]{}.,:;!?]/g, ' ')
-    .replace(/ё/g, 'е');
-  return cleaned.split(/\s+/).map(w => w.trim()).filter(w => w.length > 2 && !STOP.includes(w));
+  const STOP = ['убери','удали','удалить','сотри','стереть','убрать','исключи','исключить','remove','delete','слайд','слайда','слайде','слайдов','слайды','строку','строка','строки','строк','пункт','пункта','пункты','пунктов','текст','текста','тексты','текстов','про','об','о','это','этот','эту','эти','тот','та','те','из','на','в','во','с','со','и','а','но','или','для','по','который','которая','которые'];
+  return text.toLowerCase().replace(/слайд[а-я]*\s*\d+/gi,' ').replace(/[«»"'()\[\]{}.,:;!?]/g,' ').replace(/ё/g,'е').split(/\s+/).map(w=>w.trim()).filter(w=>w.length>2 && !STOP.includes(w));
 }
-
 function applyRevision(text){
   const lower = text.toLowerCase();
   const slides = state.slides;
   if (!slides.length) return;
-
   const isDeleteCmd = /убери|удали|удалить|сотри|стереть|убрать|исключи|исключить|remove|delete/i.test(lower);
   const slideNumMatch = text.match(/слайд[а-я]*\s*(\d+)/i);
-
   if (isDeleteCmd && slideNumMatch) {
-    const num = Number(slideNumMatch[1]);
-    let counter = 0;
+    const num = Number(slideNumMatch[1]); let counter = 0;
     for (let i = 0; i < slides.length; i++) {
       if (slides[i].isIntro) continue;
       counter++;
       if (counter === num) { slides.splice(i, 1); break; }
     }
-    renderSlides();
-    return;
+    renderSlides(); return;
   }
-
   if (isDeleteCmd) {
-    const words = extractWords(text);
-    let deletedAny = false;
+    const words = extractWords(text); let deletedAny = false;
     slides.forEach(s => {
       const before = s.body.length;
-      s.body = s.body.filter(line => {
-        const l = line.toLowerCase().replace(/ё/g, 'е');
-        return !words.some(w => l.includes(w));
-      });
+      s.body = s.body.filter(line => { const l = line.toLowerCase().replace(/ё/g,'е'); return !words.some(w => l.includes(w)); });
       if (s.body.length < before) deletedAny = true;
     });
     if (!deletedAny && words.length) {
       slides.forEach(s => {
         const before = s.body.length;
-        s.body = s.body.filter(line => {
-          const l = line.toLowerCase().replace(/ё/g, 'е');
-          return !words.some(w => {
-            const root = w.slice(0, Math.min(5, w.length));
-            return l.includes(root);
-          });
-        });
+        s.body = s.body.filter(line => { const l = line.toLowerCase().replace(/ё/g,'е'); return !words.some(w => l.includes(w.slice(0, Math.min(5, w.length)))); });
         if (s.body.length < before) deletedAny = true;
       });
     }
-    renderSlides();
-    return;
+    renderSlides(); return;
   }
-
   const targets = getTargetIndices(slides, text);
   const shorten = /короче|сократ|убрать лишн|кратк/i.test(lower);
   const addExample = /пример|добавь|дополни/i.test(lower);
   const rewriteTitle = /заголов|перепиши|переимен/i.test(lower);
-
   targets.forEach(idx => {
     const s = slides[idx];
     if (shorten) s.body = s.body.slice(0, Math.max(1, Math.ceil(s.body.length / 2)));
@@ -739,7 +556,6 @@ function applyRevision(text){
     if (rewriteTitle) s.title = `${s.title.replace(/^\d+\.\s*/, '')} — обновлённая формулировка`;
     if (!shorten && !addExample && !rewriteTitle) s.body.push(`• Уточнение: ${text}`);
   });
-
   renderSlides();
 }
 
@@ -747,11 +563,9 @@ async function exportPptx(){
   if(!state.slides.length) return;
   if(typeof PptxGenJS==='undefined') throw new Error('Библиотека PptxGenJS не загрузилась.');
   const th=getTheme(state.theme);
-  const pptx=new PptxGenJS();
-  pptx.layout='LAYOUT_16x9';
-  state.slides.forEach((s,i)=>{
-    const slide=pptx.addSlide();
-    slide.background={color:th.bg};
+  const pptx=new PptxGenJS(); pptx.layout='LAYOUT_16x9';
+  state.slides.forEach((s)=>{
+    const slide=pptx.addSlide(); slide.background={color:th.bg};
     if(th.decor==='left-stripe'){slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:0.15,h:'100%',fill:{color:th.accent},line:{color:th.accent}});}
     else if(th.decor==='top-bar'){slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:'100%',h:0.4,fill:{color:th.accent},line:{color:th.accent}});}
     else if(th.decor==='bottom-bar'){slide.addShape(pptx.ShapeType.rect,{x:0,y:5.2,w:'100%',h:0.3,fill:{color:th.accent},line:{color:th.accent}});}
@@ -765,86 +579,66 @@ async function exportPptx(){
 }
 
 const el = {
-  theme: $('theme'),
-  generateBtn: $('generateBtn'),
-  applyBtn: $('applyBtn'),
-  downloadBtn: $('downloadBtn'),
-  topic: $('topic'),
-  slideCount: $('slideCount'),
-  contentStyle: $('contentStyle'),
-  revision: $('revision'),
-  slides: $('slides')
+  theme: $('theme'), generateBtn: $('generateBtn'), applyBtn: $('applyBtn'), downloadBtn: $('downloadBtn'),
+  topic: $('topic'), slideCount: $('slideCount'), contentStyle: $('contentStyle'),
+  revision: $('revision'), slides: $('slides')
 };
 
-if (el.theme) el.theme.addEventListener('change', e => {
-  applyThemeToPreview(e.target.value);
-  if (state.slides.length) renderSlides();
-});
+if (el.theme) el.theme.addEventListener('change', e => { applyThemeToPreview(e.target.value); if (state.slides.length) renderSlides(); });
 
-if (el.generateBtn) el.generateBtn.addEventListener('click', () => {
+if (el.generateBtn) el.generateBtn.addEventListener('click', async () => {
+  const topic = (el.topic && el.topic.value || '').trim();
+  const count = Math.max(1, Math.min(50, Number(el.slideCount && el.slideCount.value) || 5));
+  const contentStyle = (el.contentStyle && el.contentStyle.value) || 'business';
+  const theme = (el.theme && el.theme.value) || 'office';
+
+  if (!topic) { genStatus.textContent = 'Укажите тему презентации.'; genStatus.className = 'status err'; return; }
+
+  state.topic = topic; state.contentStyle = contentStyle; state.theme = theme;
+  applyThemeToPreview(theme);
+
+  genStatus.textContent = 'Поиск информации в интернете (DuckDuckGo)...';
+  genStatus.className = 'status';
+  el.generateBtn.disabled = true;
+
   try {
-    const topic = (el.topic && el.topic.value || '').trim();
-    const count = Math.max(1, Math.min(50, Number(el.slideCount && el.slideCount.value) || 5));
-    const contentStyle = (el.contentStyle && el.contentStyle.value) || 'business';
-    const theme = (el.theme && el.theme.value) || 'office';
-
-    if (!topic) {
-      genStatus.textContent = 'Укажите тему презентации.';
+    const facts = await searchDuckDuckGo(topic);
+    if (!facts.length) {
+      genStatus.textContent = 'По теме «' + topic + '» в DuckDuckGo нет готовых фактов. Попробуйте переформулировать запрос (например, на английском) или выбрать другую тему.';
       genStatus.className = 'status err';
       return;
     }
-
-    state.topic = topic;
-    state.contentStyle = contentStyle;
-    state.theme = theme;
-    applyThemeToPreview(theme);
-    state.slides = generateSlides(topic, count, contentStyle);
+    state.slides = buildSlidesFromFacts(topic, count, facts);
     renderSlides();
 
     if (el.revision) el.revision.disabled = false;
     if (el.applyBtn) el.applyBtn.disabled = false;
     if (el.downloadBtn) el.downloadBtn.disabled = false;
 
-    if (currentUser) {
-      const project = {
-        title: topic,
-        topic: topic,
-        theme: theme,
-        contentStyle: contentStyle,
-        slides: JSON.parse(JSON.stringify(state.slides)),
-        date: new Date().toLocaleString('ru-RU')
-      };
-      const ok = addProject(project);
-      if (ok) genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Проект сохранён в «Мои проекты».`;
-      else genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Не удалось сохранить проект (localStorage переполнен).`;
-    } else {
-      genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Войдите, чтобы сохранять проекты.`;
-    }
+    genStatus.textContent = `Готово: ${state.slides.length} слайд(ов) на основе ${facts.length} фактов из DuckDuckGo.`;
     genStatus.className = 'status ok';
     revStatus.textContent = '';
 
+    if (currentUser) {
+      const project = { title: topic, topic, theme, contentStyle, slides: JSON.parse(JSON.stringify(state.slides)), date: new Date().toLocaleString('ru-RU') };
+      if (addProject(project)) genStatus.textContent += ' Проект сохранён.';
+    }
     if (document.getElementById('projectsPanel').classList.contains('show')) renderProjects();
   } catch (e) {
-    console.error(e);
-    genStatus.textContent = 'Ошибка: ' + (e && e.message ? e.message : e);
+    genStatus.textContent = 'Ошибка поиска: ' + e.message + '. Проверьте подключение к интернету.';
     genStatus.className = 'status err';
+  } finally {
+    el.generateBtn.disabled = false;
   }
 });
 
 if (el.applyBtn) el.applyBtn.addEventListener('click', () => {
   try {
     const text = (el.revision && el.revision.value || '').trim();
-    if (!text) {
-      revStatus.textContent = 'Введите правки.';
-      revStatus.className = 'status err';
-      return;
-    }
+    if (!text) { revStatus.textContent = 'Введите правки.'; revStatus.className = 'status err'; return; }
     applyRevision(text);
-    revStatus.textContent = 'Правки применены.';
-    revStatus.className = 'status ok';
+    revStatus.textContent = 'Правки применены.'; revStatus.className = 'status ok';
     if (el.revision) el.revision.value = '';
-
-    // Обновляем последний сохранённый проект (если пользователь вошёл)
     if (currentUser) {
       const list = getUserProjects();
       if (list.length) {
@@ -854,7 +648,6 @@ if (el.applyBtn) el.applyBtn.addEventListener('click', () => {
       }
     }
   } catch (e) {
-    console.error(e);
     revStatus.textContent = 'Ошибка: ' + (e && e.message ? e.message : e);
     revStatus.className = 'status err';
   }
@@ -862,21 +655,11 @@ if (el.applyBtn) el.applyBtn.addEventListener('click', () => {
 
 if (el.downloadBtn) el.downloadBtn.addEventListener('click', async () => {
   const btn = el.downloadBtn;
-  btn.disabled = true;
-  btn.textContent = 'Подготовка файла…';
-  try {
-    await exportPptx();
-    btn.textContent = 'Скачать .pptx';
-    btn.disabled = false;
-  } catch (e) {
-    console.error(e);
-    alert('Ошибка экспорта: ' + (e && e.message ? e.message : e));
-    btn.textContent = 'Ошибка — повторить';
-    btn.disabled = false;
-  }
+  btn.disabled = true; btn.textContent = 'Подготовка файла…';
+  try { await exportPptx(); btn.textContent = 'Скачать .pptx'; btn.disabled = false; }
+  catch (e) { console.error(e); alert('Ошибка экспорта: ' + (e && e.message ? e.message : e)); btn.textContent = 'Ошибка — повторить'; btn.disabled = false; }
 });
 
-/* ======================== Обработчики авторизации ======================== */
 document.getElementById('loginBtn').addEventListener('click', () => showAuthModal('login'));
 document.getElementById('registerBtn').addEventListener('click', () => showAuthModal('register'));
 document.getElementById('closeModalBtn').addEventListener('click', hideAuthModal);
@@ -884,29 +667,16 @@ document.getElementById('authCancelBtn').addEventListener('click', hideAuthModal
 document.getElementById('authSubmitBtn').addEventListener('click', submitAuth);
 document.getElementById('authPass').addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(); });
 document.getElementById('authNick').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('authPass').focus(); });
-document.getElementById('authModal').addEventListener('click', e => {
-  if (e.target.id === 'authModal') hideAuthModal();
-});
+document.getElementById('authModal').addEventListener('click', e => { if (e.target.id === 'authModal') hideAuthModal(); });
 document.getElementById('logoutBtn').addEventListener('click', logout);
 
 document.getElementById('passToggle').addEventListener('click', () => {
-  const passInput = document.getElementById('authPass');
-  const toggle = document.getElementById('passToggle');
-  if (passInput.type === 'password') {
-    passInput.type = 'text';
-    toggle.textContent = '🙈';
-    toggle.setAttribute('aria-label', 'Скрыть пароль');
-  } else {
-    passInput.type = 'password';
-    toggle.textContent = '👁';
-    toggle.setAttribute('aria-label', 'Показать пароль');
-  }
+  const p = document.getElementById('authPass'); const t = document.getElementById('passToggle');
+  if (p.type === 'password') { p.type = 'text'; t.textContent = '🙈'; t.setAttribute('aria-label','Скрыть пароль'); }
+  else { p.type = 'password'; t.textContent = '👁'; t.setAttribute('aria-label','Показать пароль'); }
 });
 
-document.getElementById('changeAvatarBtn').addEventListener('click', () => {
-  document.getElementById('avatarInput').click();
-});
-
+document.getElementById('changeAvatarBtn').addEventListener('click', () => document.getElementById('avatarInput').click());
 document.getElementById('avatarInput').addEventListener('change', (e) => {
   const file = e.target.files && e.target.files[0];
   if (!file || !currentUser) return;
@@ -923,16 +693,12 @@ document.getElementById('avatarInput').addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-/* ======================== Удаление аккаунта ======================== */
 document.getElementById('deleteAccountBtn').addEventListener('click', showDeleteModal);
 document.getElementById('closeDeleteBtn').addEventListener('click', hideDeleteModal);
 document.getElementById('deleteCancelBtn').addEventListener('click', hideDeleteModal);
 document.getElementById('deleteConfirmBtn').addEventListener('click', confirmDeleteAccount);
-document.getElementById('deleteModal').addEventListener('click', e => {
-  if (e.target.id === 'deleteModal') hideDeleteModal();
-});
+document.getElementById('deleteModal').addEventListener('click', e => { if (e.target.id === 'deleteModal') hideDeleteModal(); });
 
-/* ======================== Проекты ======================== */
 document.getElementById('projectsBubble').addEventListener('click', toggleProjectsPanel);
 document.addEventListener('click', (e) => {
   const panel = document.getElementById('projectsPanel');
@@ -946,7 +712,6 @@ document.addEventListener('click', (e) => {
 loadUsers();
 loadAllProjects();
 restoreSession();
-
 applyThemeToPreview(state.theme);
 </script>
 </body>
