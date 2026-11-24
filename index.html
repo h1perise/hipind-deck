@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HIPIND Deck — Real Search</title>
+<title>HIPIND Deck — Detailed Search</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230f1115'/%3E%3Crect x='24' y='24' width='132' height='132' rx='28' stroke='%23ffffff' stroke-width='10' transform='rotate(45 90 90)' fill='none'/%3E%3Crect x='44' y='44' width='92' height='92' rx='16' fill='%23ffffff' transform='rotate(45 90 90)'/%3E%3Cpath d='M70 68 V112 M110 68 V112 M70 90 H110' stroke='%230f1115' stroke-width='9' stroke-linecap='square'/%3E%3Cpath d='M120 68 V112 H130 C141 112 148 104 148 90 C148 76 141 68 130 68 H120' stroke='%230f1115' stroke-width='9' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
 <style>
   :root {
@@ -107,6 +107,7 @@
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="storage.js"></script>
 </head>
 <body>
 
@@ -237,50 +238,68 @@
 </div>
 
 <script>
-/* ======================== Хранилище ======================== */
-const STORAGE_USERS = 'hipind_users_v1';
-const STORAGE_SESSION = 'hipind_session_v1';
-const STORAGE_PROJECTS = 'hipind_projects_v1';
-
+/* ======================== Хранилище: обёртка над HipindStorage ======================== */
 let USERS = {};
-let PROJECTS = {};
-
-function loadUsers() { try { USERS = JSON.parse(localStorage.getItem(STORAGE_USERS) || '{}'); } catch(e) { USERS = {}; } }
-function saveUsers() { try { localStorage.setItem(STORAGE_USERS, JSON.stringify(USERS)); } catch(e) {} }
-function loadAllProjects() { try { PROJECTS = JSON.parse(localStorage.getItem(STORAGE_PROJECTS) || '{}'); } catch(e) { PROJECTS = {}; } }
-function saveAllProjects() { try { localStorage.setItem(STORAGE_PROJECTS, JSON.stringify(PROJECTS)); } catch(e) {} }
-function getSession() { try { return localStorage.getItem(STORAGE_SESSION); } catch(e) { return null; } }
-function setSession(nick) { try { if (nick) localStorage.setItem(STORAGE_SESSION, nick); else localStorage.removeItem(STORAGE_SESSION); } catch(e) {} }
-function hashPassword(pass) { let h = 0; for (let i = 0; i < pass.length; i++) { h = ((h << 5) - h) + pass.charCodeAt(i); h |= 0; } return 'h' + Math.abs(h).toString(36); }
-
 let currentUser = null;
 
+async function initStorage() {
+  const list = await HipindStorage.getAllUsers();
+  USERS = {};
+  list.forEach(u => { USERS[u.key] = u; });
+  const nick = await HipindStorage.getSession();
+  if (nick) {
+    const user = USERS[nick.toLowerCase()];
+    if (user) currentUser = { nick: user.nick, avatar: user.avatar || '' };
+    else await HipindStorage.setSession(null);
+  }
+  updateBubble();
+}
+
+function hashPassword(pass) { let h = 0; for (let i = 0; i < pass.length; i++) { h = ((h << 5) - h) + pass.charCodeAt(i); h |= 0; } return 'h' + Math.abs(h).toString(36); }
+
 /* ---------- Проекты ---------- */
-function getUserProjects() { if (!currentUser) return []; return PROJECTS[currentUser.nick.toLowerCase()] || []; }
-function saveUserProjects(list) { if (!currentUser) return false; PROJECTS[currentUser.nick.toLowerCase()] = list; try { saveAllProjects(); return true; } catch(e) { return false; } }
-function addProject(project) { if (!currentUser) return false; const list = getUserProjects(); list.unshift(project); return saveUserProjects(list.slice(0, 30)); }
-function renderProjects() {
+async function getUserProjects() {
+  if (!currentUser) return [];
+  return HipindStorage.getProjectsByUser(currentUser.nick.toLowerCase());
+}
+async function addProject(project) {
+  if (!currentUser) return false;
+  const record = {
+    id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    userKey: currentUser.nick.toLowerCase(),
+    title: project.title,
+    topic: project.topic,
+    theme: project.theme,
+    contentStyle: project.contentStyle,
+    slides: project.slides,
+    date: project.date,
+    createdAt: Date.now()
+  };
+  await HipindStorage.putProject(record);
+  return true;
+}
+async function renderProjects() {
   const listEl = document.getElementById('projectsList');
   const msgEl = document.getElementById('projectsMsg');
   msgEl.textContent = ''; msgEl.className = 'projects-msg';
   if (!currentUser) { listEl.innerHTML = '<div class="projects-empty">Войдите в аккаунт, чтобы видеть свои проекты.</div>'; return; }
-  const projects = getUserProjects();
+  const projects = await getUserProjects();
   if (!projects.length) { listEl.innerHTML = '<div class="projects-empty">Пока нет сохранённых проектов.</div>'; return; }
-  listEl.innerHTML = projects.map((p, i) => `
+  listEl.innerHTML = projects.map(p => `
     <div class="project-item">
       <div class="meta">
         <div class="title">${escapeHtml(p.title)}</div>
         <div class="date">${escapeHtml(p.date)}</div>
       </div>
       <div>
-        <button class="dl-btn" data-project-index="${i}">Скачать</button>
-        <button class="del-btn" data-delete-index="${i}">✕</button>
+        <button class="dl-btn" data-project-id="${p.id}">Скачать</button>
+        <button class="del-btn" data-delete-id="${p.id}">✕</button>
       </div>
     </div>`).join('');
-  listEl.querySelectorAll('.dl-btn').forEach(btn => btn.addEventListener('click', () => downloadProject(Number(btn.getAttribute('data-project-index')))));
-  listEl.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteProject(Number(btn.getAttribute('data-delete-index')))));
+  listEl.querySelectorAll('.dl-btn').forEach(btn => btn.addEventListener('click', () => downloadProject(btn.getAttribute('data-project-id'))));
+  listEl.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteProject(btn.getAttribute('data-delete-id'))));
 }
-function toggleProjectsPanel() {
+async function toggleProjectsPanel() {
   const panel = document.getElementById('projectsPanel');
   if (!currentUser) {
     panel.classList.remove('show');
@@ -290,16 +309,22 @@ function toggleProjectsPanel() {
     return;
   }
   if (panel.classList.contains('show')) panel.classList.remove('show');
-  else { renderProjects(); panel.classList.add('show'); }
+  else { await renderProjects(); panel.classList.add('show'); }
 }
-async function downloadProject(idx) {
+async function downloadProject(id) {
   if (!currentUser) return;
-  const p = getUserProjects()[idx]; if (!p) return;
+  const list = await getUserProjects();
+  const p = list.find(x => x.id === id);
+  if (!p) return;
   const prev = { slides: state.slides, topic: state.topic, theme: state.theme, contentStyle: state.contentStyle };
   state.slides = p.slides; state.topic = p.topic; state.theme = p.theme; state.contentStyle = p.contentStyle || 'business';
   try { await exportPptx(); } finally { Object.assign(state, prev); }
 }
-function deleteProject(idx) { if (!currentUser) return; const list = getUserProjects(); list.splice(idx, 1); saveUserProjects(list); renderProjects(); }
+async function deleteProject(id) {
+  if (!currentUser) return;
+  await HipindStorage.deleteProject(id);
+  await renderProjects();
+}
 
 /* ---------- Авторизация ---------- */
 function showAuthModal(mode) {
@@ -325,7 +350,7 @@ function showAuthModal(mode) {
   setTimeout(() => document.getElementById('authNick').focus(), 50);
 }
 function hideAuthModal() { document.getElementById('authModal').classList.remove('show'); }
-function submitAuth() {
+async function submitAuth() {
   const modal = document.getElementById('authModal');
   const mode = modal.dataset.mode || 'login';
   const nick = (document.getElementById('authNick').value || '').trim();
@@ -337,20 +362,30 @@ function submitAuth() {
   const key = nick.toLowerCase();
   if (mode === 'register') {
     if (USERS[key]) { msg.className = 'msg err'; msg.textContent = 'Никнейм уже занят.'; return; }
-    USERS[key] = { nick, passHash: hashPassword(pass), avatar: '' };
-    saveUsers(); setSession(nick); currentUser = { nick, avatar: '' };
+    const userRecord = { key, nick, passHash: hashPassword(pass), avatar: '' };
+    await HipindStorage.putUser(userRecord);
+    USERS[key] = userRecord;
+    await HipindStorage.setSession(nick);
+    currentUser = { nick, avatar: '' };
     msg.className = 'msg ok'; msg.textContent = 'Регистрация успешна!';
     setTimeout(() => { hideAuthModal(); updateBubble(); }, 400);
   } else {
-    const user = USERS[key];
+    let user = USERS[key];
+    if (!user) user = await HipindStorage.getUser(key);
     if (!user) { msg.className = 'msg err'; msg.textContent = 'Пользователь не найден.'; return; }
     if (user.passHash !== hashPassword(pass)) { msg.className = 'msg err'; msg.textContent = 'Неверный пароль.'; return; }
-    setSession(user.nick); currentUser = { nick: user.nick, avatar: user.avatar || '' };
+    await HipindStorage.setSession(user.nick);
+    currentUser = { nick: user.nick, avatar: user.avatar || '' };
     msg.className = 'msg ok'; msg.textContent = 'Вход выполнен.';
     setTimeout(() => { hideAuthModal(); updateBubble(); }, 300);
   }
 }
-function logout() { setSession(null); currentUser = null; updateBubble(); document.getElementById('projectsPanel').classList.remove('show'); }
+async function logout() {
+  await HipindStorage.setSession(null);
+  currentUser = null;
+  updateBubble();
+  document.getElementById('projectsPanel').classList.remove('show');
+}
 function updateBubble() {
   const guest = document.getElementById('bubbleGuest');
   const user = document.getElementById('bubbleUser');
@@ -362,14 +397,6 @@ function updateBubble() {
     if (currentUser.avatar) avatarEl.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
     else avatarEl.textContent = currentUser.nick.charAt(0).toUpperCase();
   } else { guest.style.display = 'flex'; user.style.display = 'none'; }
-}
-function restoreSession() {
-  const nick = getSession();
-  if (!nick) { updateBubble(); return; }
-  const user = USERS[nick.toLowerCase()];
-  if (user) currentUser = { nick: user.nick, avatar: user.avatar || '' };
-  else setSession(null);
-  updateBubble();
 }
 
 /* ---------- Удаление аккаунта ---------- */
@@ -389,12 +416,15 @@ function showDeleteModal() {
   }, 1000);
 }
 function hideDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); if (deleteTimerInterval) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; } }
-function confirmDeleteAccount() {
+async function confirmDeleteAccount() {
   if (!currentUser) return;
   if (document.getElementById('deleteConfirmBtn').disabled) return;
   const key = currentUser.nick.toLowerCase();
-  delete USERS[key]; delete PROJECTS[key];
-  saveUsers(); saveAllProjects(); setSession(null); currentUser = null;
+  await HipindStorage.deleteProjectsByUser(key);
+  await HipindStorage.deleteUser(key);
+  await HipindStorage.setSession(null);
+  delete USERS[key];
+  currentUser = null;
   updateBubble(); hideDeleteModal();
 }
 
@@ -437,58 +467,92 @@ const PPT_THEMES = {
 function getTheme(key){ return PPT_THEMES[key] || PPT_THEMES.office; }
 function applyThemeToPreview(key){const th=getTheme(key);const r=document.documentElement;r.style.setProperty('--slide-bg','#'+th.bg);r.style.setProperty('--slide-accent','#'+th.accent);r.style.setProperty('--slide-title','#'+th.title);r.style.setProperty('--slide-text','#'+th.text);r.style.setProperty('--slide-num','#'+th.num);r.style.setProperty('--slide-font-title',th.fontTitle+', sans-serif');r.style.setProperty('--slide-font-body',th.fontBody+', sans-serif');}
 
-/* ---------- Реальный поиск через DuckDuckGo JSONP ---------- */
-function jsonpRequest(url, callbackName = 'ddgCallback') {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    window[callbackName] = function(data) {
-      delete window[callbackName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      resolve(data);
-    };
-    script.onerror = () => {
-      delete window[callbackName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      reject(new Error('Не удалось загрузить данные из DuckDuckGo.'));
-    };
-    script.src = url + '&callback=' + callbackName;
-    document.body.appendChild(script);
-  });
+/* ---------- Поиск: Wikipedia (ru + en) с полным текстом ---------- */
+async function fetchWikiSummary(topic, lang) {
+  try {
+    const searchUrl = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&list=search&srsearch=' +
+      encodeURIComponent(topic) + '&format=json&origin=*&srlimit=1';
+    const r = await fetch(searchUrl);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.query || !d.query.search || !d.query.search.length) return null;
+    const pageTitle = d.query.search[0].title;
+    const summaryUrl = 'https://' + lang + '.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(pageTitle);
+    const sr = await fetch(summaryUrl);
+    if (!sr.ok) return null;
+    const sd = await sr.json();
+    return { title: pageTitle, extract: sd.extract || '', description: sd.description || '', lang };
+  } catch (e) { console.warn('Wikipedia summary failed (' + lang + '):', e); return null; }
 }
 
-async function searchDuckDuckGo(topic) {
-  const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(topic) + '&format=json&no_html=1&skip_disambig=1';
-  const data = await jsonpRequest(url);
+async function fetchWikiFullText(topic, lang) {
+  try {
+    const searchUrl = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&list=search&srsearch=' +
+      encodeURIComponent(topic) + '&format=json&origin=*&srlimit=1';
+    const r = await fetch(searchUrl);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.query || !d.query.search || !d.query.search.length) return null;
+    const pageTitle = d.query.search[0].title;
+    const extractUrl = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&exsectionformat=plain&titles=' + encodeURIComponent(pageTitle) + '&format=json&origin=*';
+    const er = await fetch(extractUrl);
+    if (!er.ok) return null;
+    const ed = await er.json();
+    const pages = ed.query && ed.query.pages ? Object.values(ed.query.pages) : [];
+    const page = pages[0];
+    if (!page || !page.extract) return null;
+    return { title: pageTitle, text: page.extract, lang };
+  } catch (e) { console.warn('Wikipedia full text failed (' + lang + '):', e); return null; }
+}
+
+async function searchTopic(topic) {
+  const [ruSum, enSum, ruFull, enFull] = await Promise.all([
+    fetchWikiSummary(topic, 'ru'),
+    fetchWikiSummary(topic, 'en'),
+    fetchWikiFullText(topic, 'ru'),
+    fetchWikiFullText(topic, 'en')
+  ]);
+  const wiki = (ruSum && ruSum.extract && ruSum.extract.length > 50) ? ruSum : enSum;
+  const full = (ruFull && ruFull.text && ruFull.text.length > 200) ? ruFull : enFull;
   const facts = [];
-  if (data.AbstractText) facts.push(data.AbstractText);
-  if (data.Answer) facts.push(data.Answer);
-  if (Array.isArray(data.RelatedTopics)) {
-    data.RelatedTopics.slice(0, 8).forEach(item => {
-      if (item.Text) facts.push(item.Text);
-      if (Array.isArray(item.Topics)) {
-        item.Topics.slice(0, 3).forEach(sub => { if (sub.Text) facts.push(sub.Text); });
-      }
-    });
+  if (full && full.text) {
+    const sentences = full.text.split(/(?<=[.!?])\s+/).map(s => s.replace(/\s+/g, ' ').trim()).filter(s => s.length > 40 && s.length < 400);
+    sentences.slice(2).forEach(s => facts.push(s));
   }
-  return facts;
+  return { wiki, full, facts };
 }
 
-function buildSlidesFromFacts(topic, count, facts) {
+function buildSlides(topic, count, facts, wiki) {
   const slides = [];
-  const intro = facts[0] || 'Информация по теме «' + topic + '» не найдена.';
-  slides.push({ title: topic, body: [intro], isIntro: true });
+  let introText = '';
+  if (wiki && wiki.extract) {
+    introText = wiki.extract;
+    if (wiki.description) introText = '[' + wiki.description + '] ' + introText;
+  } else if (facts.length) introText = facts[0];
+  else introText = 'Информация по теме «' + topic + '» не найдена.';
+  slides.push({ title: topic, body: [introText], isIntro: true });
 
   const innerCount = Math.max(0, count - 2);
   for (let i = 0; i < innerCount; i++) {
-    const fact = facts[i + 1] || facts[(i + 1) % Math.max(1, facts.length)];
-    slides.push({
-      title: 'Факт ' + (i + 1),
-      body: ['• ' + (fact || 'Данных по этому пункту нет.')]
-    });
+    let body = [];
+    if (i < facts.length) body.push('• ' + facts[i]);
+    else if (wiki && wiki.extract) {
+      const sentences = wiki.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 20);
+      const idx = i % Math.max(1, sentences.length);
+      body.push('• ' + (sentences[idx] || 'Дополнительная информация в статье «' + wiki.title + '».'));
+    } else body.push('• Данных по этому пункту недостаточно. Попробуйте уточнить тему.');
+    slides.push({ title: 'Пункт ' + (i + 1), body });
   }
+
   if (count > 1) {
-    const lastFact = facts[facts.length - 1] || 'Итоги по теме.';
-    slides.push({ title: 'Заключение', body: ['• ' + lastFact] });
+    let conclusion = 'Основные выводы по теме «' + topic + '».';
+    const lastFact = facts.length ? facts[facts.length - 1] : '';
+    if (lastFact && lastFact.length > 40) conclusion = lastFact;
+    else if (wiki && wiki.extract) {
+      const sentences = wiki.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 20);
+      conclusion = sentences[sentences.length - 1] || conclusion;
+    }
+    slides.push({ title: 'Заключение', body: ['• ' + conclusion] });
   }
   return slides.slice(0, count);
 }
@@ -591,48 +655,46 @@ if (el.generateBtn) el.generateBtn.addEventListener('click', async () => {
   const count = Math.max(1, Math.min(50, Number(el.slideCount && el.slideCount.value) || 5));
   const contentStyle = (el.contentStyle && el.contentStyle.value) || 'business';
   const theme = (el.theme && el.theme.value) || 'office';
-
   if (!topic) { genStatus.textContent = 'Укажите тему презентации.'; genStatus.className = 'status err'; return; }
-
   state.topic = topic; state.contentStyle = contentStyle; state.theme = theme;
   applyThemeToPreview(theme);
-
-  genStatus.textContent = 'Поиск информации в интернете (DuckDuckGo)...';
+  genStatus.textContent = 'Поиск в Wikipedia (ru + en)...';
   genStatus.className = 'status';
   el.generateBtn.disabled = true;
-
   try {
-    const facts = await searchDuckDuckGo(topic);
-    if (!facts.length) {
-      genStatus.textContent = 'По теме «' + topic + '» в DuckDuckGo нет готовых фактов. Попробуйте переформулировать запрос (например, на английском) или выбрать другую тему.';
+    const { wiki, facts } = await searchTopic(topic);
+    const hasWiki = wiki && wiki.extract && wiki.extract.length > 50;
+    const hasFacts = facts.length > 0;
+    if (!hasWiki && !hasFacts) {
+      genStatus.textContent = 'Не удалось найти информацию по теме «' + topic + '» в Wikipedia. Попробуйте переформулировать запрос.';
       genStatus.className = 'status err';
       return;
     }
-    state.slides = buildSlidesFromFacts(topic, count, facts);
+    state.slides = buildSlides(topic, count, facts, wiki);
     renderSlides();
-
     if (el.revision) el.revision.disabled = false;
     if (el.applyBtn) el.applyBtn.disabled = false;
     if (el.downloadBtn) el.downloadBtn.disabled = false;
-
-    genStatus.textContent = `Готово: ${state.slides.length} слайд(ов) на основе ${facts.length} фактов из DuckDuckGo.`;
+    let srcInfo = [];
+    if (hasWiki) srcInfo.push('Wikipedia («' + wiki.title + '», ' + wiki.lang + ')');
+    if (hasFacts) srcInfo.push('полный текст статьи (' + facts.length + ' фактов)');
+    genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Источники: ${srcInfo.join(' + ')}.`;
     genStatus.className = 'status ok';
     revStatus.textContent = '';
-
     if (currentUser) {
       const project = { title: topic, topic, theme, contentStyle, slides: JSON.parse(JSON.stringify(state.slides)), date: new Date().toLocaleString('ru-RU') };
-      if (addProject(project)) genStatus.textContent += ' Проект сохранён.';
+      if (await addProject(project)) genStatus.textContent += ' Проект сохранён.';
     }
-    if (document.getElementById('projectsPanel').classList.contains('show')) renderProjects();
+    if (document.getElementById('projectsPanel').classList.contains('show')) await renderProjects();
   } catch (e) {
-    genStatus.textContent = 'Ошибка поиска: ' + e.message + '. Проверьте подключение к интернету.';
+    genStatus.textContent = 'Ошибка поиска: ' + e.message;
     genStatus.className = 'status err';
   } finally {
     el.generateBtn.disabled = false;
   }
 });
 
-if (el.applyBtn) el.applyBtn.addEventListener('click', () => {
+if (el.applyBtn) el.applyBtn.addEventListener('click', async () => {
   try {
     const text = (el.revision && el.revision.value || '').trim();
     if (!text) { revStatus.textContent = 'Введите правки.'; revStatus.className = 'status err'; return; }
@@ -640,11 +702,11 @@ if (el.applyBtn) el.applyBtn.addEventListener('click', () => {
     revStatus.textContent = 'Правки применены.'; revStatus.className = 'status ok';
     if (el.revision) el.revision.value = '';
     if (currentUser) {
-      const list = getUserProjects();
+      const list = await getUserProjects();
       if (list.length) {
         list[0].slides = JSON.parse(JSON.stringify(state.slides));
-        saveUserProjects(list);
-        if (document.getElementById('projectsPanel').classList.contains('show')) renderProjects();
+        await HipindStorage.putProject(list[0]);
+        if (document.getElementById('projectsPanel').classList.contains('show')) await renderProjects();
       }
     }
   } catch (e) {
@@ -682,12 +744,15 @@ document.getElementById('avatarInput').addEventListener('change', (e) => {
   if (!file || !currentUser) return;
   if (!file.type.startsWith('image/')) { alert('Выберите файл изображения.'); return; }
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     const dataUrl = reader.result;
     if (dataUrl.length > 1_500_000) { alert('Файл слишком большой. Выберите изображение меньше 1 МБ.'); return; }
     currentUser.avatar = dataUrl;
     const key = currentUser.nick.toLowerCase();
-    if (USERS[key]) { USERS[key].avatar = dataUrl; saveUsers(); }
+    if (USERS[key]) {
+      USERS[key].avatar = dataUrl;
+      await HipindStorage.putUser(USERS[key]);
+    }
     updateBubble();
   };
   reader.readAsDataURL(file);
@@ -709,10 +774,7 @@ document.addEventListener('click', (e) => {
 });
 
 /* ======================== Инициализация ======================== */
-loadUsers();
-loadAllProjects();
-restoreSession();
-applyThemeToPreview(state.theme);
+initStorage().then(() => applyThemeToPreview(state.theme));
 </script>
 </body>
 </html>
