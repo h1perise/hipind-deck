@@ -3,113 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HIPIND Deck — Detailed Search</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230f1115'/%3E%3Crect x='24' y='24' width='132' height='132' rx='28' stroke='%23ffffff' stroke-width='10' transform='rotate(45 90 90)' fill='none'/%3E%3Crect x='44' y='44' width='92' height='92' rx='16' fill='%23ffffff' transform='rotate(45 90 90)'/%3E%3Cpath d='M70 68 V112 M110 68 V112 M70 90 H110' stroke='%230f1115' stroke-width='9' stroke-linecap='square'/%3E%3Cpath d='M120 68 V112 H130 C141 112 148 104 148 90 C148 76 141 68 130 68 H120' stroke='%230f1115' stroke-width='9' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
+<title>HIPIND Deck</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230f1115'/%3E%3Crect x='24' y='24' width='132' height='132' rx='28' stroke='%23ffffff' stroke-width='10' transform='rotate(45 90 90)' fill='none'/%3E%3Crect x='44' y='44' width='92' height='92' rx='16' fill='%23ffffff' transform='rotate(45 90 90)'/%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
+  /* --- ТЁМНАЯ ТЕМА (по умолчанию) --- */
   :root {
-    --ui-bg:#f4f6fb; --ui-panel:#ffffff; --ui-border:#e2e6ef; --ui-text:#1a1d24;
-    --ui-muted:#6b7385; --ui-field:#f7f9fc; --ui-field-border:#d6dbe6;
-    --ui-btn-secondary:#eef1f7; --ui-btn-secondary-text:#1a1d24;
-    --accent-btn:#4f7cff;
-    --slide-bg:#FFFFFF; --slide-accent:#4472C4; --slide-title:#1F1F1F;
-    --slide-text:#3A3A3A; --slide-num:#8C8C8C;
+    --ui-bg: #17191d;
+    --ui-panel: #1f2228;
+    --ui-panel-hover: #252830;
+    --ui-border: #2c3038;
+    --ui-text: #e2e4e9;
+    --ui-muted: #8b919e;
+    --ui-field: #15171b;
+    --ui-field-border: #2c3038;
+    --accent-btn: #5a7fff;
+    --accent-hover: #6b8cff;
+    --btn-secondary: #282c34;
+    --btn-secondary-text: #e2e4e9;
+    --slide-bg: #ffffff;
+    --slide-accent: #4472C4;
+    --slide-title: #1F1F1F;
+    --slide-text: #3A3A3A;
     --slide-font-title: Calibri, sans-serif;
     --slide-font-body: Calibri, sans-serif;
   }
-  [data-ui-theme="dark"] {
-    --ui-bg:#0f1115; --ui-panel:#171a21; --ui-border:#262b36; --ui-text:#e6e9ef;
-    --ui-muted:#8a93a6; --ui-field:#0f1115; --ui-field-border:#2b3140;
-    --ui-btn-secondary:#232936; --ui-btn-secondary-text:#e6e9ef;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-  body { background:var(--ui-bg); color:var(--ui-text); min-height:100vh; display:flex; justify-content:center; padding:24px; padding-top:64px; transition:background .2s, color .2s; }
-  .app { width:100%; max-width:1100px; display:grid; grid-template-columns:340px 1fr; gap:24px; }
-  @media (max-width:860px){ .app{ grid-template-columns:1fr; } }
-  .panel { background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:16px; padding:20px; transition:background .2s, border-color .2s; }
-  h1 { font-size:20px; margin-bottom:16px; font-weight:700; letter-spacing:-0.02em; color:var(--ui-text); }
-  label { display:block; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ui-muted); margin-bottom:6px; margin-top:14px; }
-  input, textarea, select { width:100%; background:var(--ui-field); border:1px solid var(--ui-field-border); color:var(--ui-text); border-radius:10px; padding:10px 12px; font-size:14px; outline:none; transition:border .15s, background .2s, color .2s; }
-  input:focus, textarea:focus, select:focus { border-color:var(--accent-btn); }
-  textarea { resize:vertical; min-height:64px; }
-  button { cursor:pointer; border:none; border-radius:10px; padding:12px 16px; font-size:14px; font-weight:600; transition:filter .15s, opacity .15s, background .2s, color .2s; color:#fff; }
-  button:hover { filter:brightness(1.1); }
-  button:disabled { opacity:.4; cursor:not-allowed; }
-  .btn-primary { background:var(--accent-btn); width:100%; margin-top:18px; }
-  .btn-secondary { background:var(--ui-btn-secondary); color:var(--ui-btn-secondary-text); width:100%; margin-top:12px; }
-  .btn-download { background:#1f9d55; width:auto; padding:10px 18px; }
-  .slides { display:flex; flex-direction:column; gap:16px; }
-  .slide { background:var(--slide-bg); border:1px solid var(--ui-border); border-radius:14px; padding:28px 32px; min-height:160px; position:relative; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition:background .2s; }
-  .slide::before { content:''; position:absolute; left:0; top:0; bottom:0; width:8px; background:var(--slide-accent); }
-  .slide-title { font-family: var(--slide-font-title); font-size:22px; font-weight:700; margin-bottom:14px; line-height:1.25; color:var(--slide-title); }
-  .slide-body { font-family: var(--slide-font-body); font-size:14px; line-height:1.65; color:var(--slide-text); white-space:pre-wrap; }
-  .empty { color:var(--ui-muted); text-align:center; padding:60px 20px; font-size:14px; line-height:1.7; }
-  .status { font-size:12px; color:var(--ui-muted); margin-top:10px; white-space:pre-wrap; }
-  .status.ok { color:#3ecf8e; } .status.err { color:#ff6b6b; }
-  .theme-toggle { position:fixed; top:16px; right:16px; z-index:100; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--ui-panel); color:var(--ui-text); border:1px solid var(--ui-border); font-size:18px; line-height:1; padding:0; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: background .2s, color .2s, border-color .2s, transform .15s; }
-  .theme-toggle:hover { transform: scale(1.05); filter:none; }
 
-  .user-bubble { position: fixed; top: 8px; left: 16px; z-index: 100; display: flex; align-items: center; gap: 8px; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 999px; padding: 6px 12px 6px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: background .2s, border-color .2s; font-size: 13px; }
+  /* --- СВЕТЛАЯ ТЕМА --- */
+  [data-theme-mode="light"] {
+    --ui-bg: #f4f6fb;
+    --ui-panel: #ffffff;
+    --ui-panel-hover: #f7f9fc;
+    --ui-border: #e2e6ef;
+    --ui-text: #1a1d24;
+    --ui-muted: #6b7385;
+    --ui-field: #f7f9fc;
+    --ui-field-border: #d6dbe6;
+    --accent-btn: #4f7cff;
+    --accent-hover: #6b8cff;
+    --btn-secondary: #eef1f7;
+    --btn-secondary-text: #1a1d24;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--ui-bg);
+    color: var(--ui-text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    transition: background .3s, color .3s;
+  }
+
+  /* ================== ГЛАВНАЯ (LANDING) ================== */
+  #landing {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 48px 24px; overflow: hidden;
+    background: radial-gradient(circle at 50% 30%, #2a2d33 0%, #14161a 55%, #0d0e11 100%);
+    transition: opacity .6s ease;
+  }
+  #landing.hidden { display: none; }
+
+  .land-squares { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .land-sq {
+    position: absolute; display: block; background: transparent;
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 6px;
+    animation-name: floatSq; animation-timing-function: ease-in-out; animation-iteration-count: infinite;
+    transition: transform .1s linear, opacity .1s linear, border-color .3s, background .3s;
+    will-change: transform, opacity;
+  }
+  .land-sq.fill { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); }
+  .land-sq.soft { border-color: rgba(255,255,255,0.05); background: transparent; }
+  @keyframes floatSq {
+    0% { transform: translate3d(0,0,0) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translate3d(18px,-26px,0) rotate(45deg); opacity: .9; }
+    90% { opacity: 1; }
+    100% { transform: translate3d(0,0,0) rotate(90deg); opacity: 0; }
+  }
+  #landing.warp .land-sq { animation: none !important; }
+
+  .land-glow {
+    position: absolute; top: 50%; left: 50%; width: 720px; height: 720px;
+    transform: translate(-50%, -55%);
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%);
+    filter: blur(20px); pointer-events: none; z-index: 0;
+    transition: transform 1s ease, opacity 1s ease;
+  }
+  #landing.warp .land-glow { transform: translate(-50%,-55%) scale(4); opacity: 0; }
+
+  #landing::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 75%);
+    pointer-events: none; z-index: 0; transition: opacity 1s ease;
+  }
+  #landing.warp::before { opacity: 0; }
+
+  .land-content {
+    position: relative; z-index: 2; max-width: 1000px;
+    display: flex; flex-direction: column; align-items: center;
+    transition: transform 1.2s cubic-bezier(0.4,0,0.2,1), opacity .8s ease, filter .8s ease;
+    animation: fadeUp 1.1s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  #landing.warp .land-content { transform: scale(3.5) translateZ(0); opacity: 0; filter: blur(12px); }
+
+  .land-title {
+    font-size: clamp(48px, 11vw, 150px); font-weight: 800; letter-spacing: -0.03em; line-height: 1;
+    text-transform: uppercase; color: #ffffff; word-break: break-word;
+    text-shadow: 0 0 40px rgba(255,255,255,0.15), 0 0 120px rgba(255,255,255,0.06);
+  }
+  .land-divider { width: 72px; height: 2px; margin: 36px auto; border-radius: 2px; background: linear-gradient(90deg, transparent, #9a9a9a, transparent); opacity: .8; }
+  .land-subtitle { font-size: clamp(15px, 2.2vw, 24px); font-weight: 300; letter-spacing: .16em; text-transform: uppercase; color: #b8bcc4; line-height: 1.6; }
+  .land-guest-note { margin-top: 10px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #55585f; }
+
+  .land-actions { margin-top: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 2; transition: transform .9s ease, opacity .6s ease; }
+  #landing.warp .land-actions { transform: translateY(-10px) scale(0.8); opacity: 0; pointer-events: none; }
+
+  .land-btn {
+    cursor: pointer; border: 1px solid rgba(255,255,255,0.9);
+    background: #ffffff; color: #0d0e11;
+    border-radius: 999px; padding: 18px 48px; font-size: 15px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    transition: transform .15s, filter .15s, box-shadow .3s, opacity .3s;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  }
+  .land-btn:hover { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 12px 36px rgba(0,0,0,0.5); }
+  .land-btn:active { transform: scale(0.95); }
+  .land-btn.locked { opacity: 0.45; cursor: not-allowed; border-color: rgba(255,255,255,0.2); background: transparent; color: #ffffff; box-shadow: none; }
+  .land-btn.locked:hover { transform: none; filter: none; box-shadow: none; }
+
+  .land-notice {
+    margin-top: 16px; min-height: 22px; font-size: 13px; color: #ffb4b4;
+    opacity: 0; transform: translateY(-4px); transition: opacity .25s ease, transform .25s ease; pointer-events: none;
+  }
+  .land-notice.show { opacity: 1; transform: translateY(0); }
+
+  .land-footer { position: absolute; bottom: 28px; left: 0; right: 0; text-align: center; font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase; color: #55585f; z-index: 2; transition: opacity .5s; }
+  #landing.warp .land-footer { opacity: 0; }
+
+  /* ================== ПУЗЫРЁК ПОЛЬЗОВАТЕЛЯ ================== */
+  .user-bubble {
+    position: fixed; top: 8px; left: 16px; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 999px; padding: 6px 12px 6px 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12); font-size: 13px;
+    transition: background .3s, border-color .3s, color .3s;
+  }
   .user-bubble .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ui-field); border: 1px solid var(--ui-border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--ui-muted); overflow: hidden; flex-shrink: 0; }
   .user-bubble .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .user-bubble .nick { font-weight: 600; color: var(--ui-text); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .user-bubble .pencil, .user-bubble .trash { width: 22px; height: 22px; border-radius: 6px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ui-muted); font-size: 14px; padding: 0; transition: background .15s, color .15s; }
-  .user-bubble .pencil:hover { background: var(--ui-field); color: var(--ui-text); filter: none; }
-  .user-bubble .trash:hover { background: #ff6b6b; color: #fff; filter: none; }
-  .user-bubble .auth-btn { padding: 6px 12px; border-radius: 999px; font-size: 12px; background: var(--accent-btn); color: #fff; font-weight: 600; }
+  .user-bubble .pencil, .user-bubble .trash { width: 22px; height: 22px; border-radius: 6px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ui-muted); font-size: 14px; padding: 0; }
+  .user-bubble .pencil:hover { background: var(--ui-field); color: var(--ui-text); }
+  .user-bubble .trash:hover { background: #ff6b6b; color: #fff; }
+  .user-bubble .auth-btn { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; background: #5a7fff; color: #ffffff; transition: filter .15s; }
+  .user-bubble .auth-btn:hover { filter: brightness(1.1); }
   .user-bubble .auth-btn.ghost { background: transparent; color: var(--ui-text); border: 1px solid var(--ui-border); }
   .user-bubble .auth-btn.ghost:hover { background: var(--ui-field); }
 
-  .projects-bubble { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 100; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 999px; padding: 6px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ui-text); transition: background .2s, border-color .2s, transform .15s; }
-  .projects-bubble:hover { filter: brightness(1.03); transform: translateX(-50%) translateY(-1px); }
-  .projects-bubble .icon { font-size: 15px; }
+  /* ================== КНОПКА СМЕНЫ ЦВЕТОВ (только в приложении) ================== */
+  .theme-btn {
+    position: fixed; top: 12px; right: 16px; z-index: 120;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--ui-panel); color: var(--ui-text);
+    border: 1px solid var(--ui-border);
+    cursor: pointer; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; line-height: 1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transition: background .3s, color .3s, border-color .3s, transform .15s;
+  }
+  .theme-btn:hover { transform: scale(1.06); filter: brightness(1.05); }
+  .theme-btn:active { transform: scale(0.97); }
 
-  .projects-panel { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 150; width: 92%; max-width: 560px; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: none; max-height: 70vh; overflow-y: auto; }
+  /* ================== ПРИЛОЖЕНИЕ ================== */
+  #appRoot {
+    width: 100%; max-width: 1100px;
+    display: grid; grid-template-columns: 340px 1fr; gap: 24px;
+    padding: 80px 24px 24px 24px;
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+    transition: opacity .8s cubic-bezier(0.4,0,0.2,1), transform .8s cubic-bezier(0.4,0,0.2,1);
+  }
+  #appRoot.hidden { display: none; }
+  #appRoot.show { opacity: 1; transform: translateY(0) scale(1); }
+  @media (max-width: 860px) { #appRoot { grid-template-columns: 1fr; padding-top: 72px; } }
+
+  #backToLandingBtn {
+    position: fixed; top: 60px; left: 16px; z-index: 99;
+    background: var(--ui-panel); color: var(--ui-text);
+    width: 40px; height: 40px; border-radius: 50%; padding: 0; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--ui-border); cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    transition: background .3s, color .3s, transform .15s;
+  }
+  #backToLandingBtn:hover { transform: scale(1.06); }
+
+  .panel { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 24px; transition: background .3s, border-color .3s, color .3s; }
+  h1 { font-size: 18px; margin-bottom: 16px; font-weight: 700; color: var(--ui-text); }
+  label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ui-muted); margin-bottom: 8px; margin-top: 18px; }
+  input, textarea, select { width: 100%; background: var(--ui-field); border: 1px solid var(--ui-field-border); color: var(--ui-text); border-radius: 10px; padding: 12px 14px; font-size: 14px; outline: none; transition: border .2s, background .3s, color .3s; }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent-btn); }
+  textarea { resize: vertical; min-height: 80px; }
+  button { cursor: pointer; border: none; border-radius: 10px; padding: 12px 16px; font-size: 14px; font-weight: 600; color: #fff; transition: filter .15s, opacity .15s; }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--accent-btn); width: 100%; margin-top: 24px; color: #fff; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-secondary { background: var(--btn-secondary); color: var(--btn-secondary-text); width: 100%; margin-top: 12px; }
+  .btn-secondary:hover { filter: brightness(1.1); }
+  .btn-download { background: #1f9d55; width: auto; padding: 10px 18px; font-size: 13px; }
+  .btn-download:hover { filter: brightness(1.1); }
+
+  .slides { display: flex; flex-direction: column; gap: 16px; }
+  .slide { background: var(--slide-bg); border: 1px solid var(--ui-border); border-radius: 14px; padding: 28px 32px; min-height: 160px; position: relative; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); animation: slideIn .5s ease both; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .slide::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--slide-accent); }
+  .slide-title { font-family: var(--slide-font-title); font-size: 22px; font-weight: 700; margin-bottom: 14px; line-height: 1.25; color: var(--slide-title); }
+  .slide-body { font-family: var(--slide-font-body); font-size: 14px; line-height: 1.65; color: var(--slide-text); white-space: pre-wrap; }
+  .empty { color: var(--ui-muted); text-align: center; padding: 80px 20px; font-size: 14px; line-height: 1.7; }
+  .status { font-size: 12px; color: var(--ui-muted); margin-top: 12px; white-space: pre-wrap; }
+  .status.ok { color: #3ecf8e; } .status.err { color: #ff6b6b; }
+
+  .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-left: 48px; }
+  .panel-header svg { flex-shrink: 0; }
+  .panel-header h1 { margin: 0; }
+
+  .projects-bubble { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 100; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 999px; padding: 8px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ui-text); transition: background .3s, border-color .3s, color .3s; }
+  .projects-bubble:hover { filter: brightness(1.05); }
+  .projects-bubble .icon { font-size: 16px; }
+  .projects-panel { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 150; width: 92%; max-width: 560px; background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); display: none; max-height: 70vh; overflow-y: auto; transition: background .3s, border-color .3s; }
   .projects-panel.show { display: block; }
-  .projects-panel h3 { font-size: 15px; margin-bottom: 10px; color: var(--ui-text); }
+  .projects-panel h3 { font-size: 15px; margin-bottom: 12px; color: var(--ui-text); }
   .projects-list { display: flex; flex-direction: column; gap: 8px; }
   .project-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--ui-field); border: 1px solid var(--ui-field-border); border-radius: 10px; }
   .project-item .meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .project-item .title { font-size: 13px; font-weight: 600; color: var(--ui-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .project-item .date { font-size: 11px; color: var(--ui-muted); }
-  .project-item .dl-btn { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #1f9d55; color: #fff; white-space: nowrap; }
-  .project-item .del-btn { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #dc2626; color: #fff; white-space: nowrap; margin-left: 4px; }
-  .projects-empty { color: var(--ui-muted); font-size: 13px; text-align: center; padding: 20px 0; }
-  .projects-msg { font-size: 12px; color: #ff6b6b; margin-top: 8px; }
-  .projects-msg.ok { color: #3ecf8e; }
+  .project-item .dl-btn { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #1f9d55; color: #fff; }
+  .project-item .del-btn { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #dc2626; color: #fff; margin-left: 4px; }
+  .projects-empty { color: var(--ui-muted); font-size: 13px; text-align: center; padding: 24px 0; }
 
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
   .modal-overlay.show { display: flex; }
-  .modal { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); color: var(--ui-text); }
+  .modal { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 16px; padding: 24px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); color: var(--ui-text); position: relative; transition: background .3s, border-color .3s, color .3s; }
   .modal h2 { font-size: 18px; margin-bottom: 4px; }
   .modal .subtitle { font-size: 13px; color: var(--ui-muted); margin-bottom: 16px; }
-  .modal label { margin-top: 10px; }
-  .modal input { margin-top: 2px; }
+  .modal label { margin-top: 12px; }
+  .modal input { margin-top: 4px; }
   .modal .msg { font-size: 12px; margin-top: 10px; min-height: 16px; }
   .modal .msg.err { color: #ff6b6b; }
   .modal .msg.ok { color: #3ecf8e; }
-  .modal .actions { display: flex; gap: 8px; margin-top: 16px; }
+  .modal .actions { display: flex; gap: 8px; margin-top: 20px; }
   .modal .actions button { flex: 1; }
-  .modal .close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: transparent; color: var(--ui-muted); font-size: 18px; padding: 0; display: flex; align-items: center; justify-content: center; }
-  .modal .close-btn:hover { background: var(--ui-field); filter: none; }
-  .modal-wrap { position: relative; }
+  .modal .close-btn { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: transparent; color: var(--ui-muted); font-size: 18px; padding: 0; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
+  .modal .close-btn:hover { background: var(--ui-field); }
   .pass-wrap { position: relative; }
   .pass-wrap input { padding-right: 42px; }
-  .pass-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 8px; background: transparent; color: var(--ui-muted); display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; cursor: pointer; transition: background .15s, color .15s; }
-  .pass-toggle:hover { background: var(--ui-field); color: var(--ui-text); filter: none; }
-  .btn-danger { background: #dc2626; width: 100%; margin-top: 18px; }
-  .btn-danger:disabled { background: #dc2626; }
-
-  @media (max-width: 600px) {
-    body { padding-top: 72px; }
-    .user-bubble { top: 8px; left: 8px; }
-    .projects-bubble { top: 60px; left: 50%; transform: translateX(-50%); }
-    .projects-panel { top: 110px; }
-  }
+  .pass-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 8px; background: transparent; color: var(--ui-muted); display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; cursor: pointer; border: none; }
+  .pass-toggle:hover { background: var(--ui-field); color: var(--ui-text); }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-<script src="storage.js"></script>
 </head>
-<body>
+<body data-theme-mode="dark">
 
 <div class="user-bubble" id="userBubble">
   <div id="bubbleGuest" style="display:flex; gap:8px; align-items:center;">
@@ -126,655 +289,510 @@
   <input type="file" id="avatarInput" accept="image/*" style="display:none">
 </div>
 
-<div class="projects-bubble" id="projectsBubble">
-  <span class="icon">📁</span>
-  <span>Проекты</span>
-</div>
+<main id="landing">
+  <div class="land-squares" id="landSquares"></div>
+  <div class="land-glow"></div>
+  <div class="land-content">
+    <h1 class="land-title">HIPIND Deck</h1>
+    <div class="land-divider"></div>
+    <p class="land-subtitle">Сервис для создания презентаций</p>
+    <div class="land-actions">
+      <button class="land-btn locked" id="startBtn" aria-disabled="true">Начать творить</button>
+      <div class="land-notice" id="landNotice"></div>
+    </div>
+  </div>
+  <div class="land-footer">HIPIND</div>
+</main>
 
-<div class="projects-panel" id="projectsPanel">
-  <h3>Мои проекты</h3>
-  <div class="projects-list" id="projectsList"></div>
-  <div class="projects-msg" id="projectsMsg"></div>
-</div>
+<div id="appRoot" class="hidden">
+  <button class="theme-btn" id="themeBtn" title="Сменить тему" aria-label="Сменить тему"><span id="themeIcon">🌙</span></button>
 
-<button class="theme-toggle" id="themeToggle" title="Сменить тему интерфейса" aria-label="Сменить тему"><span id="themeIcon">🌙</span></button>
+  <div class="projects-bubble" id="projectsBubble"><span class="icon">📁</span><span>Проекты</span></div>
+  <div class="projects-panel" id="projectsPanel">
+    <h3>Мои проекты</h3>
+    <div class="projects-list" id="projectsList"></div>
+  </div>
 
-<div class="app">
-  <div>
-    <div class="panel">
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-        <svg width="40" height="40" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="24" y="24" width="132" height="132" rx="28" stroke="currentColor" stroke-width="10" transform="rotate(45 90 90)"/>
-          <rect x="44" y="44" width="92" height="92" rx="16" fill="currentColor" transform="rotate(45 90 90)"/>
-          <path d="M70 68 V112 M110 68 V112 M70 90 H110" stroke="var(--ui-panel)" stroke-width="9" stroke-linecap="square"/>
-          <path d="M120 68 V112 H130 C141 112 148 104 148 90 C148 76 141 68 130 68 H120" stroke="var(--ui-panel)" stroke-width="9" stroke-linecap="square" fill="none"/>
-        </svg>
-        <h1 style="margin:0;">HIPIND Deck</h1>
+  <div style="display:contents;">
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <svg width="32" height="32" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="24" y="24" width="132" height="132" rx="28" stroke="currentColor" stroke-width="10" transform="rotate(45 90 90)"/>
+            <rect x="44" y="44" width="92" height="92" rx="16" fill="currentColor" transform="rotate(45 90 90)"/>
+            <path d="M70 68 V112 M110 68 V112 M70 90 H110" stroke="var(--ui-panel)" stroke-width="9" stroke-linecap="square"/>
+            <path d="M120 68 V112 H130 C141 112 148 104 148 90 C148 76 141 68 130 68 H120" stroke="var(--ui-panel)" stroke-width="9" stroke-linecap="square" fill="none"/>
+          </svg>
+          <h1>HIPIND Deck</h1>
+        </div>
+        <label for="topic">Тема презентации</label>
+        <input id="topic" type="text" placeholder="Например: Введение в машинное обучение">
+        <label for="slideCount">Количество слайдов</label>
+        <input id="slideCount" type="number" min="1" max="50" value="5">
+        <label for="contentStyle">Стиль изложения</label>
+        <select id="contentStyle">
+          <option value="business">Деловой</option>
+          <option value="educational">Учебный</option>
+          <option value="marketing">Маркетинговый</option>
+          <option value="technical">Технический</option>
+        </select>
+        <label for="theme">Тема конструктора PowerPoint</label>
+        <select id="theme">
+          <option value="office">Office (Базовый)</option>
+          <option value="facet">Facet (Зеленый)</option>
+          <option value="ion">Ion (Темно-синий)</option>
+          <option value="integral">Integral (Красный)</option>
+          <option value="retrospect">Retrospect (Бежевый)</option>
+          <option value="slice">Slice (Оранжевый)</option>
+          <option value="wisp">Wisp (Салатовый)</option>
+          <option value="badge">Badge (Яркий)</option>
+          <option value="banded">Banded (Синий)</option>
+          <option value="gallery">Gallery (Серый)</option>
+          <option value="mainevent">Main Event (Черный)</option>
+          <option value="metropolitan">Metropolitan (Строгий)</option>
+          <option value="parallax">Parallax (Голубой)</option>
+          <option value="dividend">Dividend (Зеленый)</option>
+          <option value="frame">Frame (Рамка)</option>
+          <option value="berlin">Berlin (Красный)</option>
+          <option value="celestial">Celestial (Космос)</option>
+          <option value="droplet">Droplet (Вода)</option>
+          <option value="headline">Headline (Газета)</option>
+          <option value="linen">Linen (Лен)</option>
+          <option value="mesh">Mesh (Сетка)</option>
+          <option value="organic">Organic (Природа)</option>
+          <option value="savon">Savon (Мыло)</option>
+          <option value="vivid">Vivid (Розовый)</option>
+          <option value="waves">Waves (Волны)</option>
+        </select>
+        <button class="btn-primary" id="generateBtn">Сгенерировать презентацию</button>
+        <div class="status" id="genStatus"></div>
       </div>
-
-      <label for="topic">Тема презентации</label>
-      <input id="topic" type="text" placeholder="Например: Введение в машинное обучение">
-      <label for="slideCount">Количество слайдов</label>
-      <input id="slideCount" type="number" min="1" max="50" value="5">
-      <label for="contentStyle">Стиль изложения</label>
-      <select id="contentStyle">
-        <option value="business">Деловой</option><option value="educational">Учебный</option>
-        <option value="marketing">Маркетинговый</option><option value="technical">Технический</option>
-      </select>
-      <label for="theme">Тема конструктора PowerPoint</label>
-      <select id="theme">
-        <option value="office">Office (Базовый)</option><option value="facet">Facet (Зеленый)</option>
-        <option value="ion">Ion (Темно-синий)</option><option value="integral">Integral (Красный)</option>
-        <option value="retrospect">Retrospect (Бежевый)</option><option value="slice">Slice (Оранжевый)</option>
-        <option value="wisp">Wisp (Салатовый)</option><option value="badge">Badge (Яркий)</option>
-        <option value="banded">Banded (Синий)</option><option value="gallery">Gallery (Серый)</option>
-        <option value="mainevent">Main Event (Черный)</option><option value="metropolitan">Metropolitan (Строгий)</option>
-        <option value="parallax">Parallax (Голубой)</option><option value="dividend">Dividend (Зеленый)</option>
-        <option value="frame">Frame (Рамка)</option><option value="berlin">Berlin (Красный)</option>
-        <option value="celestial">Celestial (Космос)</option><option value="droplet">Droplet (Вода)</option>
-        <option value="headline">Headline (Газета)</option><option value="linen">Linen (Лен)</option>
-        <option value="mesh">Mesh (Сетка)</option><option value="organic">Organic (Природа)</option>
-        <option value="savon">Savon (Мыло)</option><option value="vivid">Vivid (Розовый)</option>
-        <option value="waves">Waves (Волны)</option>
-      </select>
-
-      <button class="btn-primary" id="generateBtn">Сгенерировать презентацию</button>
-      <div class="status" id="genStatus"></div>
+      <div class="panel" style="margin-top:20px;">
+        <h1 style="font-size:16px;">Правки</h1>
+        <label for="revision">Что исправить в готовой презентации</label>
+        <textarea id="revision" placeholder="Например: убери строку с метриками, сократи слайд 1, удали слайд 2" disabled></textarea>
+        <button class="btn-secondary" id="applyBtn" disabled>Применить правки</button>
+        <div class="status" id="revStatus"></div>
+      </div>
     </div>
-    <div class="panel" style="margin-top:20px;">
-      <h1 style="font-size:16px;">Правки</h1>
-      <label for="revision">Что исправить в готовой презентации</label>
-      <textarea id="revision" placeholder="Например: убери строку с метриками, сократи слайд 1, удали слайд 2" disabled></textarea>
-      <button class="btn-secondary" id="applyBtn" disabled>Применить правки</button>
-      <div class="status" id="revStatus"></div>
+    <div class="panel" style="display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h1 style="margin:0;">Слайды</h1>
+        <button class="btn-download" id="downloadBtn" disabled>Скачать .pptx</button>
+      </div>
+      <div class="slides" id="slides" style="flex:1;">
+        <div class="empty">Презентация ещё не создана.<br>Введите тему и нажмите «Сгенерировать презентацию».</div>
+      </div>
     </div>
   </div>
-  <div class="panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h1 style="margin:0;">Слайды</h1>
-      <button class="btn-download" id="downloadBtn" disabled>Скачать .pptx</button>
-    </div>
-    <div class="slides" id="slides">
-      <div class="empty">Презентация ещё не создана.<br>Введите тему и нажмите «Сгенерировать презентацию».</div>
-    </div>
-  </div>
+
+  <button id="backToLandingBtn" title="На главную">←</button>
 </div>
 
 <div class="modal-overlay" id="authModal">
-  <div class="modal-wrap">
-    <div class="modal">
-      <button class="close-btn" id="closeModalBtn" aria-label="Закрыть">✕</button>
-      <h2 id="authTitle">Вход</h2>
-      <div class="subtitle" id="authSubtitle">Введите никнейм и пароль</div>
-      <label for="authNick">Никнейм</label>
-      <input id="authNick" type="text" placeholder="Ваш никнейм" autocomplete="username">
-      <label for="authPass">Пароль</label>
-      <div class="pass-wrap">
-        <input id="authPass" type="password" placeholder="Ваш пароль" autocomplete="current-password">
-        <button type="button" class="pass-toggle" id="passToggle" aria-label="Показать пароль">👁</button>
-      </div>
-      <div class="msg" id="authMsg"></div>
-      <div class="actions">
-        <button class="btn-secondary" id="authCancelBtn" style="margin-top:0;">Отмена</button>
-        <button class="btn-primary" id="authSubmitBtn" style="margin-top:0;">Войти</button>
-      </div>
+  <div class="modal">
+    <button class="close-btn" id="closeModalBtn">✕</button>
+    <h2 id="authTitle">Вход</h2>
+    <div class="subtitle" id="authSubtitle">Введите никнейм и пароль</div>
+    <label for="authNick">Никнейм</label>
+    <input id="authNick" type="text" placeholder="Ваш никнейм">
+    <label for="authPass">Пароль</label>
+    <div class="pass-wrap">
+      <input id="authPass" type="password" placeholder="Ваш пароль">
+      <button type="button" class="pass-toggle" id="passToggle">👁</button>
     </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal-wrap">
-    <div class="modal">
-      <button class="close-btn" id="closeDeleteBtn" aria-label="Закрыть">✕</button>
-      <h2>Удалить аккаунт?</h2>
-      <div class="subtitle">Все ваши данные будут безвозвратно удалены.</div>
-      <div class="msg" id="deleteMsg"></div>
-      <div class="actions">
-        <button class="btn-secondary" id="deleteCancelBtn" style="margin-top:0;">Отменить</button>
-        <button class="btn-danger" id="deleteConfirmBtn" style="margin-top:0;" disabled>Подтвердить (10)</button>
-      </div>
+    <div class="msg" id="authMsg"></div>
+    <div class="actions">
+      <button class="btn-secondary" id="authCancelBtn" style="margin-top:0;">Отмена</button>
+      <button class="btn-primary" id="authSubmitBtn" style="margin-top:0;">Войти</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ======================== Хранилище: обёртка над HipindStorage ======================== */
-let USERS = {};
-let currentUser = null;
-
-async function initStorage() {
-  const list = await HipindStorage.getAllUsers();
-  USERS = {};
-  list.forEach(u => { USERS[u.key] = u; });
-  const nick = await HipindStorage.getSession();
-  if (nick) {
-    const user = USERS[nick.toLowerCase()];
-    if (user) currentUser = { nick: user.nick, avatar: user.avatar || '' };
-    else await HipindStorage.setSession(null);
-  }
-  updateBubble();
-}
-
-function hashPassword(pass) { let h = 0; for (let i = 0; i < pass.length; i++) { h = ((h << 5) - h) + pass.charCodeAt(i); h |= 0; } return 'h' + Math.abs(h).toString(36); }
-
-/* ---------- Проекты ---------- */
-async function getUserProjects() {
-  if (!currentUser) return [];
-  return HipindStorage.getProjectsByUser(currentUser.nick.toLowerCase());
-}
-async function addProject(project) {
-  if (!currentUser) return false;
-  const record = {
-    id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-    userKey: currentUser.nick.toLowerCase(),
-    title: project.title,
-    topic: project.topic,
-    theme: project.theme,
-    contentStyle: project.contentStyle,
-    slides: project.slides,
-    date: project.date,
-    createdAt: Date.now()
+/* ============ IndexedDB ============ */
+(function(g){
+  const NAME='hipind_db', VER=1;
+  function open(){return new Promise((res,rej)=>{const r=indexedDB.open(NAME,VER);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('users'))d.createObjectStore('users',{keyPath:'key'});if(!d.objectStoreNames.contains('projects')){const s=d.createObjectStore('projects',{keyPath:'id'});s.createIndex('userKey','userKey');}if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'});};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+  function tx(store,mode,fn){return open().then(db=>new Promise((res,rej)=>{const t=db.transaction(store,mode);const s=t.objectStore(store);const r=fn(s);t.oncomplete=()=>res(r&&r.result!==undefined?r.result:true);t.onerror=()=>rej(t.error);}));}
+  g.HipindStorage={
+    async getAllUsers(){const db=await open();return new Promise((res,rej)=>{const r=db.transaction('users','readonly').objectStore('users').getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});},
+    async getUser(k){const db=await open();return new Promise((res,rej)=>{const r=db.transaction('users','readonly').objectStore('users').get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error);});},
+    async putUser(u){return tx('users','readwrite',s=>s.put(u));},
+    async deleteUser(k){return tx('users','readwrite',s=>s.delete(k));},
+    async getProjectsByUser(k){const db=await open();return new Promise((res,rej)=>{const r=db.transaction('projects','readonly').objectStore('projects').index('userKey').getAll(k);r.onsuccess=()=>{const l=r.result||[];l.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));res(l);};r.onerror=()=>rej(r.error);});},
+    async putProject(p){return tx('projects','readwrite',s=>s.put(p));},
+    async deleteProject(id){return tx('projects','readwrite',s=>s.delete(id));},
+    async getSession(){const db=await open();return new Promise((res,rej)=>{const r=db.transaction('meta','readonly').objectStore('meta').get('session');r.onsuccess=()=>res(r.result?r.result.value:null);r.onerror=()=>rej(r.error);});},
+    async setSession(n){return tx('meta','readwrite',s=>{if(n)s.put({key:'session',value:n});else s.delete('session');});}
   };
-  await HipindStorage.putProject(record);
-  return true;
+})(window);
+
+/* ============ Состояние ============ */
+let USERS={}, currentUser=null;
+const state={topic:'',contentStyle:'business',theme:'office',slides:[]};
+const $=id=>document.getElementById(id);
+function hashPass(p){let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0;}return 'h'+Math.abs(h).toString(36);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ============ Тема ============ */
+const THEME_KEY = 'hipind_theme_mode';
+function applyThemeMode(mode) {
+  document.documentElement.setAttribute('data-theme-mode', mode);
+  document.body.setAttribute('data-theme-mode', mode);
+  const icon = mode === 'light' ? '☀️' : '🌙';
+  const i1 = $('themeIcon');
+  if (i1) i1.textContent = icon;
+  try { localStorage.setItem(THEME_KEY, mode); } catch(e) {}
 }
-async function renderProjects() {
-  const listEl = document.getElementById('projectsList');
-  const msgEl = document.getElementById('projectsMsg');
-  msgEl.textContent = ''; msgEl.className = 'projects-msg';
-  if (!currentUser) { listEl.innerHTML = '<div class="projects-empty">Войдите в аккаунт, чтобы видеть свои проекты.</div>'; return; }
-  const projects = await getUserProjects();
-  if (!projects.length) { listEl.innerHTML = '<div class="projects-empty">Пока нет сохранённых проектов.</div>'; return; }
-  listEl.innerHTML = projects.map(p => `
-    <div class="project-item">
-      <div class="meta">
-        <div class="title">${escapeHtml(p.title)}</div>
-        <div class="date">${escapeHtml(p.date)}</div>
-      </div>
-      <div>
-        <button class="dl-btn" data-project-id="${p.id}">Скачать</button>
-        <button class="del-btn" data-delete-id="${p.id}">✕</button>
-      </div>
-    </div>`).join('');
-  listEl.querySelectorAll('.dl-btn').forEach(btn => btn.addEventListener('click', () => downloadProject(btn.getAttribute('data-project-id'))));
-  listEl.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteProject(btn.getAttribute('data-delete-id'))));
+function toggleThemeMode() {
+  const cur = document.documentElement.getAttribute('data-theme-mode') === 'light' ? 'light' : 'dark';
+  applyThemeMode(cur === 'light' ? 'dark' : 'light');
 }
-async function toggleProjectsPanel() {
-  const panel = document.getElementById('projectsPanel');
-  if (!currentUser) {
-    panel.classList.remove('show');
-    const b = document.getElementById('loginBtn');
-    b.style.boxShadow = '0 0 0 3px rgba(79,124,255,0.4)';
-    setTimeout(() => { b.style.boxShadow = ''; }, 1200);
+
+/* ============ Квадраты ============ */
+let landSquaresList = [];
+(function(){
+  const c=$('landSquares');if(!c)return;const rnd=(a,b)=>Math.random()*(b-a)+a;
+  for(let i=0;i<40;i++){
+    const sq=document.createElement('span');sq.className='land-sq';
+    const k=Math.random();if(k<0.3)sq.classList.add('fill');else if(k<0.6)sq.classList.add('soft');
+    const s=rnd(8,64);sq.style.width=s+'px';sq.style.height=s+'px';
+    sq.style.left=rnd(2,96)+'vw';sq.style.top=rnd(2,94)+'vh';
+    sq.style.animationDuration=rnd(8,22)+'s';
+    sq.style.animationDelay=(-rnd(0,20))+'s';
+    sq.style.opacity=rnd(0.15,0.55);
+    sq.dataset.z = rnd(1, 5);
+    c.appendChild(sq);
+    landSquaresList.push(sq);
+  }
+})();
+
+/* ============ Уведомление ============ */
+let noticeTimer = null;
+function showNotice(text) {
+  const el = $('landNotice');
+  el.textContent = text;
+  el.classList.add('show');
+  if (noticeTimer) clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => {
+    el.classList.remove('show');
+    noticeTimer = null;
+  }, 3500);
+}
+
+/* ============ Авторизация ============ */
+function updateStartButton() {
+  const btn = $('startBtn');
+  if (currentUser) {
+    btn.classList.remove('locked');
+    btn.setAttribute('aria-disabled', 'false');
+  } else {
+    btn.classList.add('locked');
+    btn.setAttribute('aria-disabled', 'true');
+  }
+}
+function updateBubbles(){
+  const g=$('bubbleGuest'),u=$('bubbleUser');
+  if(currentUser){g.style.display='none';u.style.display='flex';$('userNick').textContent=currentUser.nick;if(currentUser.avatar)$('userAvatar').innerHTML='<img src="'+currentUser.avatar+'">';else $('userAvatar').textContent=currentUser.nick[0].toUpperCase();}
+  else{g.style.display='flex';u.style.display='none';}
+  updateStartButton();
+}
+async function initAuth(){
+  const list=await HipindStorage.getAllUsers();USERS={};list.forEach(u=>USERS[u.key]=u);
+  const nick=await HipindStorage.getSession();
+  if(nick){const u=USERS[nick.toLowerCase()];if(u)currentUser={nick:u.nick,avatar:u.avatar||''};else await HipindStorage.setSession(null);}
+  updateBubbles();
+}
+function showAuth(mode){
+  $('authModal').dataset.mode=mode;$('authMsg').textContent='';$('authMsg').className='msg';
+  $('authNick').value='';const p=$('authPass');p.value='';p.type='password';$('passToggle').textContent='👁';
+  if(mode==='register'){$('authTitle').textContent='Регистрация';$('authSubtitle').textContent='Придумайте никнейм и пароль';$('authSubmitBtn').textContent='Зарегистрироваться';}
+  else{$('authTitle').textContent='Вход';$('authSubtitle').textContent='Введите никнейм и пароль';$('authSubmitBtn').textContent='Войти';}
+  $('authModal').classList.add('show');setTimeout(()=>$('authNick').focus(),50);
+}
+function hideAuth(){$('authModal').classList.remove('show');}
+async function submitAuth(){
+  const mode=$('authModal').dataset.mode||'login';
+  const nick=($('authNick').value||'').trim();const pass=$('authPass').value||'';
+  const msg=$('authMsg');msg.className='msg';msg.textContent='';
+  if(nick.length<3){msg.className='msg err';msg.textContent='Никнейм не короче 3 символов.';return;}
+  if(pass.length<4){msg.className='msg err';msg.textContent='Пароль не короче 4 символов.';return;}
+  const key=nick.toLowerCase();
+  if(mode==='register'){
+    if(USERS[key]){msg.className='msg err';msg.textContent='Никнейм уже занят.';return;}
+    const rec={key,nick,passHash:hashPass(pass),avatar:''};
+    await HipindStorage.putUser(rec);USERS[key]=rec;await HipindStorage.setSession(nick);
+    currentUser={nick,avatar:''};msg.className='msg ok';msg.textContent='Регистрация успешна!';
+    setTimeout(()=>{hideAuth();updateBubbles();},350);
+  }else{
+    let u=USERS[key]||await HipindStorage.getUser(key);
+    if(!u){msg.className='msg err';msg.textContent='Пользователь не найден.';return;}
+    if(u.passHash!==hashPass(pass)){msg.className='msg err';msg.textContent='Неверный пароль.';return;}
+    await HipindStorage.setSession(u.nick);currentUser={nick:u.nick,avatar:u.avatar||''};
+    msg.className='msg ok';msg.textContent='Вход выполнен.';setTimeout(()=>{hideAuth();updateBubbles();},250);
+  }
+}
+async function logout(){await HipindStorage.setSession(null);currentUser=null;updateBubbles();showLanding();}
+
+/* ============ Анимация перехода ============ */
+function animateToApp(){
+  if(!currentUser){
+    showNotice('Сначала войдите в существующий аккаунт или зарегистрируйте новый.');
     return;
   }
-  if (panel.classList.contains('show')) panel.classList.remove('show');
-  else { await renderProjects(); panel.classList.add('show'); }
-}
-async function downloadProject(id) {
-  if (!currentUser) return;
-  const list = await getUserProjects();
-  const p = list.find(x => x.id === id);
-  if (!p) return;
-  const prev = { slides: state.slides, topic: state.topic, theme: state.theme, contentStyle: state.contentStyle };
-  state.slides = p.slides; state.topic = p.topic; state.theme = p.theme; state.contentStyle = p.contentStyle || 'business';
-  try { await exportPptx(); } finally { Object.assign(state, prev); }
-}
-async function deleteProject(id) {
-  if (!currentUser) return;
-  await HipindStorage.deleteProject(id);
-  await renderProjects();
-}
+  
+  const landing = $('landing');
+  const app = $('appRoot');
+  
+  landing.classList.add('warp');
+  
+  landSquaresList.forEach((sq) => {
+    const rect = sq.getBoundingClientRect();
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const dx = (rect.left + rect.width / 2 - centerX);
+    const dy = (rect.top + rect.height / 2 - centerY);
+    const delay = parseFloat(sq.dataset.z) * 40; 
+    
+    sq.style.transition = `transform 1s cubic-bezier(0.2, 0.8, 0.3, 1) ${delay}ms, opacity 0.8s ease ${delay}ms`;
+    
+    requestAnimationFrame(() => {
+      const scale = 10 + Math.random() * 5;
+      sq.style.transform = `translate3d(${dx * 1.5}px, ${dy * 1.5}px, 0) scale(${scale}) rotate(${Math.random() * 90}deg)`;
+      sq.style.opacity = '0';
+    });
+  });
 
-/* ---------- Авторизация ---------- */
-function showAuthModal(mode) {
-  const modal = document.getElementById('authModal');
-  modal.dataset.mode = mode;
-  document.getElementById('authMsg').textContent = '';
-  document.getElementById('authMsg').className = 'msg';
-  document.getElementById('authNick').value = '';
-  const passInput = document.getElementById('authPass');
-  passInput.value = ''; passInput.type = 'password';
-  const pt = document.getElementById('passToggle');
-  pt.textContent = '👁'; pt.setAttribute('aria-label', 'Показать пароль');
-  if (mode === 'register') {
-    document.getElementById('authTitle').textContent = 'Регистрация';
-    document.getElementById('authSubtitle').textContent = 'Придумайте никнейм и пароль';
-    document.getElementById('authSubmitBtn').textContent = 'Зарегистрироваться';
-  } else {
-    document.getElementById('authTitle').textContent = 'Вход';
-    document.getElementById('authSubtitle').textContent = 'Введите никнейм и пароль';
-    document.getElementById('authSubmitBtn').textContent = 'Войти';
-  }
-  modal.classList.add('show');
-  setTimeout(() => document.getElementById('authNick').focus(), 50);
-}
-function hideAuthModal() { document.getElementById('authModal').classList.remove('show'); }
-async function submitAuth() {
-  const modal = document.getElementById('authModal');
-  const mode = modal.dataset.mode || 'login';
-  const nick = (document.getElementById('authNick').value || '').trim();
-  const pass = (document.getElementById('authPass').value || '');
-  const msg = document.getElementById('authMsg');
-  msg.className = 'msg'; msg.textContent = '';
-  if (!nick || nick.length < 3) { msg.className = 'msg err'; msg.textContent = 'Никнейм должен быть не короче 3 символов.'; return; }
-  if (!pass || pass.length < 4) { msg.className = 'msg err'; msg.textContent = 'Пароль должен быть не короче 4 символов.'; return; }
-  const key = nick.toLowerCase();
-  if (mode === 'register') {
-    if (USERS[key]) { msg.className = 'msg err'; msg.textContent = 'Никнейм уже занят.'; return; }
-    const userRecord = { key, nick, passHash: hashPassword(pass), avatar: '' };
-    await HipindStorage.putUser(userRecord);
-    USERS[key] = userRecord;
-    await HipindStorage.setSession(nick);
-    currentUser = { nick, avatar: '' };
-    msg.className = 'msg ok'; msg.textContent = 'Регистрация успешна!';
-    setTimeout(() => { hideAuthModal(); updateBubble(); }, 400);
-  } else {
-    let user = USERS[key];
-    if (!user) user = await HipindStorage.getUser(key);
-    if (!user) { msg.className = 'msg err'; msg.textContent = 'Пользователь не найден.'; return; }
-    if (user.passHash !== hashPassword(pass)) { msg.className = 'msg err'; msg.textContent = 'Неверный пароль.'; return; }
-    await HipindStorage.setSession(user.nick);
-    currentUser = { nick: user.nick, avatar: user.avatar || '' };
-    msg.className = 'msg ok'; msg.textContent = 'Вход выполнен.';
-    setTimeout(() => { hideAuthModal(); updateBubble(); }, 300);
-  }
-}
-async function logout() {
-  await HipindStorage.setSession(null);
-  currentUser = null;
-  updateBubble();
-  document.getElementById('projectsPanel').classList.remove('show');
-}
-function updateBubble() {
-  const guest = document.getElementById('bubbleGuest');
-  const user = document.getElementById('bubbleUser');
-  const nickEl = document.getElementById('userNick');
-  const avatarEl = document.getElementById('userAvatar');
-  if (currentUser) {
-    guest.style.display = 'none'; user.style.display = 'flex';
-    nickEl.textContent = currentUser.nick;
-    if (currentUser.avatar) avatarEl.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
-    else avatarEl.textContent = currentUser.nick.charAt(0).toUpperCase();
-  } else { guest.style.display = 'flex'; user.style.display = 'none'; }
-}
-
-/* ---------- Удаление аккаунта ---------- */
-let deleteTimerInterval = null;
-function showDeleteModal() {
-  if (!currentUser) return;
-  document.getElementById('deleteMsg').textContent = '';
-  document.getElementById('deleteModal').classList.add('show');
-  let n = 10;
-  const btn = document.getElementById('deleteConfirmBtn');
-  btn.disabled = true; btn.textContent = `Подтвердить (${n})`;
-  if (deleteTimerInterval) clearInterval(deleteTimerInterval);
-  deleteTimerInterval = setInterval(() => {
-    n--;
-    if (n <= 0) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; btn.disabled = false; btn.textContent = 'Подтвердить'; }
-    else btn.textContent = `Подтвердить (${n})`;
+  setTimeout(() => {
+    landing.classList.add('hidden');
+    app.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        app.classList.add('show');
+      });
+    });
+    setTimeout(() => {
+      renderProjects().catch(()=>{});
+    }, 300);
   }, 1000);
 }
-function hideDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); if (deleteTimerInterval) { clearInterval(deleteTimerInterval); deleteTimerInterval = null; } }
-async function confirmDeleteAccount() {
-  if (!currentUser) return;
-  if (document.getElementById('deleteConfirmBtn').disabled) return;
-  const key = currentUser.nick.toLowerCase();
-  await HipindStorage.deleteProjectsByUser(key);
-  await HipindStorage.deleteUser(key);
-  await HipindStorage.setSession(null);
-  delete USERS[key];
-  currentUser = null;
-  updateBubble(); hideDeleteModal();
-}
 
-/* ======================== Приложение ======================== */
-const state = { topic:'', contentStyle:'business', theme:'office', slides:[] };
-const $ = id => document.getElementById(id);
-const genStatus = $('genStatus'); const revStatus = $('revStatus');
-const UI_KEY = 'hipind_ui_theme';
-function applyUiTheme(mode){ if(mode==='dark'){document.documentElement.setAttribute('data-ui-theme','dark');$('themeIcon').textContent='☀️';} else {document.documentElement.removeAttribute('data-ui-theme');$('themeIcon').textContent='🌙';} try { localStorage.setItem(UI_KEY,mode); } catch(e){} }
-$('themeToggle').addEventListener('click',()=>{const isDark=document.documentElement.getAttribute('data-ui-theme')==='dark';applyUiTheme(isDark?'light':'dark');});
-try { applyUiTheme(localStorage.getItem(UI_KEY)||'light'); } catch(e) { applyUiTheme('light'); }
+$('startBtn').addEventListener('click', animateToApp);
 
-const PPT_THEMES = {
-  office:{name:'Office',bg:'FFFFFF',accent:'4472C4',title:'1F1F1F',text:'3A3A3A',num:'8C8C8C',fontTitle:'Calibri',fontBody:'Calibri',decor:'left-stripe'},
-  facet:{name:'Facet',bg:'F2F2F2',accent:'7FBA00',title:'1A1A1A',text:'3F3F3F',num:'808080',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
-  ion:{name:'Ion',bg:'1F3864',accent:'4BACC6',title:'FFFFFF',text:'D6E4F0',num:'9DC3E6',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'bottom-bar'},
-  integral:{name:'Integral',bg:'FFFFFF',accent:'C00000',title:'000000',text:'404040',num:'808080',fontTitle:'Arial Black',fontBody:'Arial',decor:'top-bar'},
-  retrospect:{name:'Retrospect',bg:'F7F3E9',accent:'806000',title:'3B2E1E',text:'5B4A34',num:'9C8060',fontTitle:'Georgia',fontBody:'Calibri',decor:'double-line'},
-  slice:{name:'Slice',bg:'FFFFFF',accent:'ED7D31',title:'1A1A1A',text:'3F3F3F',num:'A6A6A6',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
-  wisp:{name:'Wisp',bg:'F2F7F2',accent:'70AD47',title:'1E3B22',text:'33503A',num:'7F9F88',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
-  badge:{name:'Badge',bg:'FFFFFF',accent:'FF0000',title:'000000',text:'262626',num:'808080',fontTitle:'Impact',fontBody:'Calibri',decor:'top-bar'},
-  banded:{name:'Banded',bg:'FFFFFF',accent:'1F4E79',title:'1F4E79',text:'333333',num:'7F7F7F',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'left-stripe'},
-  gallery:{name:'Gallery',bg:'FBFBFB',accent:'5B9BD5',title:'222222',text:'404040',num:'A5A5A5',fontTitle:'Georgia',fontBody:'Calibri',decor:'bottom-bar'},
-  mainevent:{name:'Main Event',bg:'0A0A0A',accent:'FFC000',title:'FFFFFF',text:'D9D9D9',num:'808080',fontTitle:'Impact',fontBody:'Calibri',decor:'left-stripe'},
-  metropolitan:{name:'Metropolitan',bg:'EDEDED',accent:'404040',title:'1A1A1A',text:'404040',num:'808080',fontTitle:'Georgia',fontBody:'Calibri',decor:'top-bar'},
-  parallax:{name:'Parallax',bg:'0E1B2C',accent:'1F9BD1',title:'FFFFFF',text:'C9D6E3',num:'7F93A8',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
-  dividend:{name:'Dividend',bg:'FFFFFF',accent:'2E7D32',title:'1B5E20',text:'33691E',num:'7F8C7F',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'bottom-bar'},
-  frame:{name:'Frame',bg:'F2F2F2',accent:'7F7F7F',title:'262626',text:'404040',num:'808080',fontTitle:'Georgia',fontBody:'Calibri',decor:'double-line'},
-  berlin:{name:'Berlin',bg:'FFFFFF',accent:'E21F26',title:'1A1A1A',text:'404040',num:'A6A6A6',fontTitle:'Arial',fontBody:'Arial',decor:'left-stripe'},
-  celestial:{name:'Celestial',bg:'1B1130',accent:'B49BE0',title:'F2E9FF',text:'D3C6EC',num:'8D7BB0',fontTitle:'Georgia',fontBody:'Calibri',decor:'top-bar'},
-  droplet:{name:'Droplet',bg:'E8F4FB',accent:'1F9BD1',title:'0B3E5C',text:'1F4E66',num:'5F8CA0',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'bottom-bar'},
-  headline:{name:'Headline',bg:'FFFFFF',accent:'002060',title:'002060',text:'333333',num:'808080',fontTitle:'Arial Black',fontBody:'Arial',decor:'top-bar'},
-  linen:{name:'Linen',bg:'F5EFE6',accent:'A67C52',title:'3D2E1E',text:'5B4A34',num:'A08A70',fontTitle:'Georgia',fontBody:'Calibri',decor:'double-line'},
-  mesh:{name:'Mesh',bg:'F0F0F0',accent:'5B9BD5',title:'1F3864',text:'404040',num:'8C8C8C',fontTitle:'Calibri',fontBody:'Calibri',decor:'corner-shape'},
-  organic:{name:'Organic',bg:'F2F7EE',accent:'548235',title:'2E4A1F',text:'3E5A2E',num:'7F9A6F',fontTitle:'Georgia',fontBody:'Calibri',decor:'left-stripe'},
-  savon:{name:'Savon',bg:'FFFFFF',accent:'B39DDB',title:'311B92',text:'4A3A78',num:'9585B5',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'top-bar'},
-  vivid:{name:'Vivid',bg:'FFFFFF',accent:'FF0066',title:'1A1A1A',text:'404040',num:'A6A6A6',fontTitle:'Impact',fontBody:'Calibri',decor:'left-stripe'},
-  waves:{name:'Waves',bg:'0B2545',accent:'4BACC6',title:'FFFFFF',text:'C8DCE6',num:'7FA5B5',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'}
-};
-function getTheme(key){ return PPT_THEMES[key] || PPT_THEMES.office; }
-function applyThemeToPreview(key){const th=getTheme(key);const r=document.documentElement;r.style.setProperty('--slide-bg','#'+th.bg);r.style.setProperty('--slide-accent','#'+th.accent);r.style.setProperty('--slide-title','#'+th.title);r.style.setProperty('--slide-text','#'+th.text);r.style.setProperty('--slide-num','#'+th.num);r.style.setProperty('--slide-font-title',th.fontTitle+', sans-serif');r.style.setProperty('--slide-font-body',th.fontBody+', sans-serif');}
-
-/* ---------- Поиск: Wikipedia (ru + en) с полным текстом ---------- */
-async function fetchWikiSummary(topic, lang) {
-  try {
-    const searchUrl = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&list=search&srsearch=' +
-      encodeURIComponent(topic) + '&format=json&origin=*&srlimit=1';
-    const r = await fetch(searchUrl);
-    if (!r.ok) return null;
-    const d = await r.json();
-    if (!d.query || !d.query.search || !d.query.search.length) return null;
-    const pageTitle = d.query.search[0].title;
-    const summaryUrl = 'https://' + lang + '.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(pageTitle);
-    const sr = await fetch(summaryUrl);
-    if (!sr.ok) return null;
-    const sd = await sr.json();
-    return { title: pageTitle, extract: sd.extract || '', description: sd.description || '', lang };
-  } catch (e) { console.warn('Wikipedia summary failed (' + lang + '):', e); return null; }
-}
-
-async function fetchWikiFullText(topic, lang) {
-  try {
-    const searchUrl = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&list=search&srsearch=' +
-      encodeURIComponent(topic) + '&format=json&origin=*&srlimit=1';
-    const r = await fetch(searchUrl);
-    if (!r.ok) return null;
-    const d = await r.json();
-    if (!d.query || !d.query.search || !d.query.search.length) return null;
-    const pageTitle = d.query.search[0].title;
-    const extractUrl = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&exsectionformat=plain&titles=' + encodeURIComponent(pageTitle) + '&format=json&origin=*';
-    const er = await fetch(extractUrl);
-    if (!er.ok) return null;
-    const ed = await er.json();
-    const pages = ed.query && ed.query.pages ? Object.values(ed.query.pages) : [];
-    const page = pages[0];
-    if (!page || !page.extract) return null;
-    return { title: pageTitle, text: page.extract, lang };
-  } catch (e) { console.warn('Wikipedia full text failed (' + lang + '):', e); return null; }
-}
-
-async function searchTopic(topic) {
-  const [ruSum, enSum, ruFull, enFull] = await Promise.all([
-    fetchWikiSummary(topic, 'ru'),
-    fetchWikiSummary(topic, 'en'),
-    fetchWikiFullText(topic, 'ru'),
-    fetchWikiFullText(topic, 'en')
-  ]);
-  const wiki = (ruSum && ruSum.extract && ruSum.extract.length > 50) ? ruSum : enSum;
-  const full = (ruFull && ruFull.text && ruFull.text.length > 200) ? ruFull : enFull;
-  const facts = [];
-  if (full && full.text) {
-    const sentences = full.text.split(/(?<=[.!?])\s+/).map(s => s.replace(/\s+/g, ' ').trim()).filter(s => s.length > 40 && s.length < 400);
-    sentences.slice(2).forEach(s => facts.push(s));
-  }
-  return { wiki, full, facts };
-}
-
-function buildSlides(topic, count, facts, wiki) {
-  const slides = [];
-  let introText = '';
-  if (wiki && wiki.extract) {
-    introText = wiki.extract;
-    if (wiki.description) introText = '[' + wiki.description + '] ' + introText;
-  } else if (facts.length) introText = facts[0];
-  else introText = 'Информация по теме «' + topic + '» не найдена.';
-  slides.push({ title: topic, body: [introText], isIntro: true });
-
-  const innerCount = Math.max(0, count - 2);
-  for (let i = 0; i < innerCount; i++) {
-    let body = [];
-    if (i < facts.length) body.push('• ' + facts[i]);
-    else if (wiki && wiki.extract) {
-      const sentences = wiki.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 20);
-      const idx = i % Math.max(1, sentences.length);
-      body.push('• ' + (sentences[idx] || 'Дополнительная информация в статье «' + wiki.title + '».'));
-    } else body.push('• Данных по этому пункту недостаточно. Попробуйте уточнить тему.');
-    slides.push({ title: 'Пункт ' + (i + 1), body });
-  }
-
-  if (count > 1) {
-    let conclusion = 'Основные выводы по теме «' + topic + '».';
-    const lastFact = facts.length ? facts[facts.length - 1] : '';
-    if (lastFact && lastFact.length > 40) conclusion = lastFact;
-    else if (wiki && wiki.extract) {
-      const sentences = wiki.extract.split(/(?<=[.!?])\s+/).filter(s => s.length > 20);
-      conclusion = sentences[sentences.length - 1] || conclusion;
-    }
-    slides.push({ title: 'Заключение', body: ['• ' + conclusion] });
-  }
-  return slides.slice(0, count);
-}
-
-function renderSlides(){const c=$('slides');if(!state.slides.length){c.innerHTML='<div class="empty">Презентация пуста.</div>';return;}c.innerHTML=state.slides.map((s,i)=>`<div class="slide"><div class="slide-title">${escapeHtml(s.title)}</div><div class="slide-body">${s.body.map(escapeHtml).join('\n')}</div></div>`).join('');}
-function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function getTargetIndices(slides, text){
-  const matches = [...text.matchAll(/слайд[а-я]*\s*(\d+)/gi)];
-  if (!matches.length) return slides.map((_, i) => i);
-  const result = new Set();
-  matches.forEach(m => {
-    const num = Number(m[1]); let counter = 0;
-    for (let i = 0; i < slides.length; i++) {
-      if (slides[i].isIntro) continue;
-      counter++;
-      if (counter === num) { result.add(i); break; }
-    }
-  });
-  return [...result].filter(n => n >= 0 && n < slides.length);
-}
-function extractWords(text){
-  const STOP = ['убери','удали','удалить','сотри','стереть','убрать','исключи','исключить','remove','delete','слайд','слайда','слайде','слайдов','слайды','строку','строка','строки','строк','пункт','пункта','пункты','пунктов','текст','текста','тексты','текстов','про','об','о','это','этот','эту','эти','тот','та','те','из','на','в','во','с','со','и','а','но','или','для','по','который','которая','которые'];
-  return text.toLowerCase().replace(/слайд[а-я]*\s*\d+/gi,' ').replace(/[«»"'()\[\]{}.,:;!?]/g,' ').replace(/ё/g,'е').split(/\s+/).map(w=>w.trim()).filter(w=>w.length>2 && !STOP.includes(w));
-}
-function applyRevision(text){
-  const lower = text.toLowerCase();
-  const slides = state.slides;
-  if (!slides.length) return;
-  const isDeleteCmd = /убери|удали|удалить|сотри|стереть|убрать|исключи|исключить|remove|delete/i.test(lower);
-  const slideNumMatch = text.match(/слайд[а-я]*\s*(\d+)/i);
-  if (isDeleteCmd && slideNumMatch) {
-    const num = Number(slideNumMatch[1]); let counter = 0;
-    for (let i = 0; i < slides.length; i++) {
-      if (slides[i].isIntro) continue;
-      counter++;
-      if (counter === num) { slides.splice(i, 1); break; }
-    }
-    renderSlides(); return;
-  }
-  if (isDeleteCmd) {
-    const words = extractWords(text); let deletedAny = false;
-    slides.forEach(s => {
-      const before = s.body.length;
-      s.body = s.body.filter(line => { const l = line.toLowerCase().replace(/ё/g,'е'); return !words.some(w => l.includes(w)); });
-      if (s.body.length < before) deletedAny = true;
+function showLanding(){
+  const landing=$('landing'),app=$('appRoot');
+  app.classList.remove('show');
+  setTimeout(()=>{
+    app.classList.add('hidden');
+    landing.classList.remove('hidden');
+    landing.classList.remove('warp');
+    landSquaresList.forEach((sq, i) => {
+      sq.style.transition = 'none';
+      sq.style.transform = '';
+      sq.style.opacity = '';
+      void sq.offsetWidth;
+      sq.style.transition = 'transform 1s cubic-bezier(0.4,0,0.2,1), opacity 1s ease, border-color .3s, background .3s';
     });
-    if (!deletedAny && words.length) {
-      slides.forEach(s => {
-        const before = s.body.length;
-        s.body = s.body.filter(line => { const l = line.toLowerCase().replace(/ё/g,'е'); return !words.some(w => l.includes(w.slice(0, Math.min(5, w.length)))); });
-        if (s.body.length < before) deletedAny = true;
-      });
-    }
-    renderSlides(); return;
+  }, 400);
+  updateStartButton();
+}
+
+/* ============ Проекты ============ */
+async function getProjects(){return currentUser?HipindStorage.getProjectsByUser(currentUser.nick.toLowerCase()):[];}
+async function renderProjects(){
+  const l=$('projectsList');
+  if(!currentUser){l.innerHTML='<div class="projects-empty">Войдите в аккаунт.</div>';return;}
+  const ps=await getProjects();
+  if(!ps.length){l.innerHTML='<div class="projects-empty">Пока нет проектов.</div>';return;}
+  l.innerHTML=ps.map(p=>`<div class="project-item"><div class="meta"><div class="title">${esc(p.title)}</div><div class="date">${esc(p.date)}</div></div><div><button class="dl-btn" data-id="${p.id}">Скачать</button><button class="del-btn" data-del="${p.id}">✕</button></div></div>`).join('');
+  l.querySelectorAll('.dl-btn').forEach(b=>b.onclick=()=>downloadProject(b.dataset.id));
+  l.querySelectorAll('.del-btn').forEach(b=>b.onclick=async()=>{await HipindStorage.deleteProject(b.dataset.del);renderProjects();});
+}
+async function downloadProject(id){
+  const ps=await getProjects();const p=ps.find(x=>x.id===id);if(!p)return;
+  const prev={slides:state.slides,topic:state.topic,theme:state.theme,contentStyle:state.contentStyle};
+  state.slides=p.slides;state.topic=p.topic;state.theme=p.theme;state.contentStyle=p.contentStyle||'business';
+  try{await exportPptx();}finally{Object.assign(state,prev);}
+}
+
+/* ============ Темы PowerPoint ============ */
+const THEMES={
+  office:{bg:'FFFFFF',accent:'4472C4',title:'1F1F1F',text:'3A3A3A',fontTitle:'Calibri',fontBody:'Calibri',decor:'left-stripe'},
+  facet:{bg:'F2F2F2',accent:'7FBA00',title:'1A1A1A',text:'3F3F3F',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
+  ion:{bg:'1F3864',accent:'4BACC6',title:'FFFFFF',text:'D6E4F0',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'bottom-bar'},
+  integral:{bg:'FFFFFF',accent:'C00000',title:'000000',text:'404040',fontTitle:'Arial Black',fontBody:'Arial',decor:'top-bar'},
+  retrospect:{bg:'F7F3E9',accent:'806000',title:'3B2E1E',text:'5B4A34',fontTitle:'Georgia',fontBody:'Calibri',decor:'double-line'},
+  slice:{bg:'FFFFFF',accent:'ED7D31',title:'1A1A1A',text:'3F3F3F',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
+  wisp:{bg:'F2F7F2',accent:'70AD47',title:'1E3B22',text:'33503A',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
+  badge:{bg:'FFFFFF',accent:'FF0000',title:'000000',text:'262626',fontTitle:'Impact',fontBody:'Calibri',decor:'top-bar'},
+  banded:{bg:'FFFFFF',accent:'1F4E79',title:'1F4E79',text:'333333',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'left-stripe'},
+  gallery:{bg:'FBFBFB',accent:'5B9BD5',title:'222222',text:'404040',fontTitle:'Georgia',fontBody:'Calibri',decor:'bottom-bar'},
+  mainevent:{bg:'0A0A0A',accent:'FFC000',title:'FFFFFF',text:'D9D9D9',fontTitle:'Impact',fontBody:'Calibri',decor:'left-stripe'},
+  metropolitan:{bg:'EDEDED',accent:'404040',title:'1A1A1A',text:'404040',fontTitle:'Georgia',fontBody:'Calibri',decor:'top-bar'},
+  parallax:{bg:'0E1B2C',accent:'1F9BD1',title:'FFFFFF',text:'C9D6E3',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'},
+  dividend:{bg:'FFFFFF',accent:'2E7D32',title:'1B5E20',text:'33691E',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'bottom-bar'},
+  frame:{bg:'F2F2F2',accent:'7F7F7F',title:'262626',text:'404040',fontTitle:'Georgia',fontBody:'Calibri',decor:'double-line'},
+  berlin:{bg:'FFFFFF',accent:'E21F26',title:'1A1A1A',text:'404040',fontTitle:'Arial',fontBody:'Arial',decor:'left-stripe'},
+  celestial:{bg:'1B1130',accent:'B49BE0',title:'F2E9FF',text:'D3C6EC',fontTitle:'Georgia',fontBody:'Calibri',decor:'top-bar'},
+  droplet:{bg:'E8F4FB',accent:'1F9BD1',title:'0B3E5C',text:'1F4E66',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'bottom-bar'},
+  headline:{bg:'FFFFFF',accent:'002060',title:'002060',text:'333333',fontTitle:'Arial Black',fontBody:'Arial',decor:'top-bar'},
+  linen:{bg:'F5EFE6',accent:'A67C52',title:'3D2E1E',text:'5B4A34',fontTitle:'Georgia',fontBody:'Calibri',decor:'double-line'},
+  mesh:{bg:'F0F0F0',accent:'5B9BD5',title:'1F3864',text:'404040',fontTitle:'Calibri',fontBody:'Calibri',decor:'corner-shape'},
+  organic:{bg:'F2F7EE',accent:'548235',title:'2E4A1F',text:'3E5A2E',fontTitle:'Georgia',fontBody:'Calibri',decor:'left-stripe'},
+  savon:{bg:'FFFFFF',accent:'B39DDB',title:'311B92',text:'4A3A78',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'top-bar'},
+  vivid:{bg:'FFFFFF',accent:'FF0066',title:'1A1A1A',text:'404040',fontTitle:'Impact',fontBody:'Calibri',decor:'left-stripe'},
+  waves:{bg:'0B2545',accent:'4BACC6',title:'FFFFFF',text:'C8DCE6',fontTitle:'Calibri Light',fontBody:'Calibri',decor:'corner-shape'}
+};
+function getTheme(k){return THEMES[k]||THEMES.office;}
+function applyThemePreview(k){const th=getTheme(k);const r=document.documentElement;r.style.setProperty('--slide-bg','#'+th.bg);r.style.setProperty('--slide-accent','#'+th.accent);r.style.setProperty('--slide-title','#'+th.title);r.style.setProperty('--slide-text','#'+th.text);r.style.setProperty('--slide-font-title',th.fontTitle+', sans-serif');r.style.setProperty('--slide-font-body',th.fontBody+', sans-serif');}
+
+/* ============ Wikipedia ============ */
+async function wikiSummary(topic,lang){
+  try{
+    const r=await fetch('https://'+lang+'.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(topic)+'&format=json&origin=*&srlimit=1');
+    if(!r.ok)return null;const d=await r.json();
+    if(!d.query||!d.query.search||!d.query.search.length)return null;
+    const t=d.query.search[0].title;
+    const s=await fetch('https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(t));
+    if(!s.ok)return null;const sd=await s.json();
+    return{title:t,extract:sd.extract||'',description:sd.description||'',lang};
+  }catch(e){return null;}
+}
+async function wikiFull(topic,lang){
+  try{
+    const r=await fetch('https://'+lang+'.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(topic)+'&format=json&origin=*&srlimit=1');
+    if(!r.ok)return null;const d=await r.json();
+    if(!d.query||!d.query.search||!d.query.search.length)return null;
+    const t=d.query.search[0].title;
+    const e=await fetch('https://'+lang+'.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&exsectionformat=plain&titles='+encodeURIComponent(t)+'&format=json&origin=*');
+    if(!e.ok)return null;const ed=await e.json();
+    const pages=ed.query&&ed.query.pages?Object.values(ed.query.pages):[];
+    const p=pages[0];if(!p||!p.extract)return null;
+    return{title:t,text:p.extract,lang};
+  }catch(e){return null;}
+}
+async function searchTopic(topic){
+  const [rs,es,rf,ef]=await Promise.all([wikiSummary(topic,'ru'),wikiSummary(topic,'en'),wikiFull(topic,'ru'),wikiFull(topic,'en')]);
+  const wiki=(rs&&rs.extract&&rs.extract.length>50)?rs:es;
+  const full=(rf&&rf.text&&rf.text.length>200)?rf:ef;
+  const facts=[];
+  if(full&&full.text){full.text.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(s=>s.length>40&&s.length<400).slice(2).forEach(s=>facts.push(s));}
+  return{wiki,facts};
+}
+function buildSlides(topic,count,facts,wiki){
+  const slides=[];
+  let intro=wiki&&wiki.extract?wiki.extract:(facts[0]||'Информация не найдена.');
+  if(wiki&&wiki.description&&wiki.extract)intro='['+wiki.description+'] '+intro;
+  slides.push({title:topic,body:[intro],isIntro:true});
+  const inner=Math.max(0,count-2);
+  for(let i=0;i<inner;i++){
+    let body=[];
+    if(i<facts.length)body.push('• '+facts[i]);
+    else if(wiki&&wiki.extract){const ss=wiki.extract.split(/(?<=[.!?])\s+/).filter(s=>s.length>20);body.push('• '+(ss[i%Math.max(1,ss.length)]||'Дополнительно.'));}
+    else body.push('• Недостаточно данных.');
+    slides.push({title:'Пункт '+(i+1),body});
   }
-  const targets = getTargetIndices(slides, text);
-  const shorten = /короче|сократ|убрать лишн|кратк/i.test(lower);
-  const addExample = /пример|добавь|дополни/i.test(lower);
-  const rewriteTitle = /заголов|перепиши|переимен/i.test(lower);
-  targets.forEach(idx => {
-    const s = slides[idx];
-    if (shorten) s.body = s.body.slice(0, Math.max(1, Math.ceil(s.body.length / 2)));
-    if (addExample) s.body.push('• Пример: конкретная ситуация, иллюстрирующая этот тезис.');
-    if (rewriteTitle) s.title = `${s.title.replace(/^\d+\.\s*/, '')} — обновлённая формулировка`;
-    if (!shorten && !addExample && !rewriteTitle) s.body.push(`• Уточнение: ${text}`);
+  if(count>1){let c='Основные выводы.';const last=facts.length?facts[facts.length-1]:'';if(last&&last.length>40)c=last;slides.push({title:'Заключение',body:['• '+c]});}
+  return slides.slice(0,count);
+}
+function renderSlides(){const c=$('slides');if(!state.slides.length){c.innerHTML='<div class="empty">Презентация пуста.</div>';return;}c.innerHTML=state.slides.map(s=>`<div class="slide"><div class="slide-title">${esc(s.title)}</div><div class="slide-body">${s.body.map(esc).join('\n')}</div></div>`).join('');}
+
+function applyRevision(text){
+  const slides=state.slides;if(!slides.length)return;
+  const del=/убери|удали|сотри|стереть|убрать|исключи|remove|delete/i.test(text);
+  const numM=text.match(/слайд[а-я]*\s*(\d+)/i);
+  if(del&&numM){const n=Number(numM[1]);let cnt=0;for(let i=0;i<slides.length;i++){if(slides[i].isIntro)continue;cnt++;if(cnt===n){slides.splice(i,1);break;}}renderSlides();return;}
+  if(del){const words=text.toLowerCase().replace(/[«»"'()\[\]{}.,:;!?]/g,' ').split(/\s+/).filter(w=>w.length>3&&!['убери','удали','сотри','стереть','убрать','слайд','слайда','строку','текст'].includes(w));
+    slides.forEach(s=>{s.body=s.body.filter(l=>{const ll=l.toLowerCase();return !words.some(w=>ll.includes(w));});});renderSlides();return;}
+  const short=/короче|сократ|кратк/i.test(text);
+  const ex=/пример|добавь/i.test(text);
+  const ren=/заголов|перепиши|переимен/i.test(text);
+  slides.forEach(s=>{
+    if(short)s.body=s.body.slice(0,Math.max(1,Math.ceil(s.body.length/2)));
+    if(ex)s.body.push('• Пример: конкретная ситуация.');
+    if(ren)s.title=s.title+' — обновлено';
+    if(!short&&!ex&&!ren)s.body.push('• Уточнение: '+text);
   });
   renderSlides();
 }
 
 async function exportPptx(){
-  if(!state.slides.length) return;
-  if(typeof PptxGenJS==='undefined') throw new Error('Библиотека PptxGenJS не загрузилась.');
-  const th=getTheme(state.theme);
-  const pptx=new PptxGenJS(); pptx.layout='LAYOUT_16x9';
-  state.slides.forEach((s)=>{
-    const slide=pptx.addSlide(); slide.background={color:th.bg};
-    if(th.decor==='left-stripe'){slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:0.15,h:'100%',fill:{color:th.accent},line:{color:th.accent}});}
-    else if(th.decor==='top-bar'){slide.addShape(pptx.ShapeType.rect,{x:0,y:0,w:'100%',h:0.4,fill:{color:th.accent},line:{color:th.accent}});}
-    else if(th.decor==='bottom-bar'){slide.addShape(pptx.ShapeType.rect,{x:0,y:5.2,w:'100%',h:0.3,fill:{color:th.accent},line:{color:th.accent}});}
-    else if(th.decor==='corner-shape'){slide.addShape(pptx.ShapeType.rect,{x:8.5,y:4.5,w:1.5,h:1.5,fill:{color:th.accent},line:{color:th.accent},rotate:45});}
-    else if(th.decor==='double-line'){slide.addShape(pptx.ShapeType.rect,{x:0.5,y:0.3,w:9,h:0.02,fill:{color:th.accent},line:{color:th.accent}});slide.addShape(pptx.ShapeType.rect,{x:0.5,y:0.35,w:9,h:0.02,fill:{color:th.accent},line:{color:th.accent}});}
-    slide.addText(s.title,{x:0.5,y:0.7,w:9,h:1.2,fontSize:28,bold:true,color:th.title,fontFace:th.fontTitle,valign:'top'});
-    slide.addText(s.body.join('\n'),{x:0.5,y:2.1,w:9,h:3.2,fontSize:16,color:th.text,fontFace:th.fontBody,valign:'top',lineSpacing:24});
+  if(!state.slides.length)throw new Error('Нет слайдов.');
+  if(typeof PptxGenJS==='undefined')throw new Error('PptxGenJS не загружена.');
+  const th=getTheme(state.theme);const pptx=new PptxGenJS();pptx.layout='LAYOUT_16x9';
+  state.slides.forEach(s=>{
+    const sl=pptx.addSlide();sl.background={color:th.bg};
+    if(th.decor==='left-stripe')sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:0.15,h:'100%',fill:{color:th.accent},line:{color:th.accent}});
+    else if(th.decor==='top-bar')sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:'100%',h:0.4,fill:{color:th.accent},line:{color:th.accent}});
+    else if(th.decor==='bottom-bar')sl.addShape(pptx.ShapeType.rect,{x:0,y:5.2,w:'100%',h:0.3,fill:{color:th.accent},line:{color:th.accent}});
+    else if(th.decor==='corner-shape')sl.addShape(pptx.ShapeType.rect,{x:8.5,y:4.5,w:1.5,h:1.5,fill:{color:th.accent},line:{color:th.accent},rotate:45});
+    else if(th.decor==='double-line'){sl.addShape(pptx.ShapeType.rect,{x:0.5,y:0.3,w:9,h:0.02,fill:{color:th.accent},line:{color:th.accent}});sl.addShape(pptx.ShapeType.rect,{x:0.5,y:0.35,w:9,h:0.02,fill:{color:th.accent},line:{color:th.accent}});}
+    sl.addText(s.title,{x:0.5,y:0.7,w:9,h:1.2,fontSize:28,bold:true,color:th.title,fontFace:th.fontTitle});
+    sl.addText(s.body.join('\n'),{x:0.5,y:2.1,w:9,h:3.2,fontSize:16,color:th.text,fontFace:th.fontBody,lineSpacing:24});
   });
-  const topicSafe=(state.topic||'presentation').replace(/[^\wа-яё\s-]/gi,'').trim().replace(/\s+/g,'_').slice(0,60)||'presentation';
-  await pptx.writeFile({fileName:`HIPIND_${topicSafe}.pptx`});
+  const safe=(state.topic||'presentation').replace(/[^\wа-яё\s-]/gi,'').trim().replace(/\s+/g,'_').slice(0,60)||'presentation';
+  await pptx.writeFile({fileName:'HIPIND_'+safe+'.pptx'});
 }
 
-const el = {
-  theme: $('theme'), generateBtn: $('generateBtn'), applyBtn: $('applyBtn'), downloadBtn: $('downloadBtn'),
-  topic: $('topic'), slideCount: $('slideCount'), contentStyle: $('contentStyle'),
-  revision: $('revision'), slides: $('slides')
+/* ============ Обработчики ============ */
+$('loginBtn').onclick=()=>showAuth('login');
+$('registerBtn').onclick=()=>showAuth('register');
+$('logoutBtn').onclick=logout;
+$('closeModalBtn').onclick=hideAuth;
+$('authCancelBtn').onclick=hideAuth;
+$('authSubmitBtn').onclick=submitAuth;
+$('authPass').onkeydown=e=>{if(e.key==='Enter')submitAuth();};
+$('authModal').onclick=e=>{if(e.target.id==='authModal')hideAuth();};
+$('passToggle').onclick=()=>{const p=$('authPass'),t=$('passToggle');if(p.type==='password'){p.type='text';t.textContent='🙈';}else{p.type='password';t.textContent='👁';}};
+$('changeAvatarBtn').onclick=()=>$('avatarInput').click();
+$('avatarInput').onchange=e=>{
+  const f=e.target.files&&e.target.files[0];if(!f||!currentUser)return;
+  const r=new FileReader();r.onload=async()=>{if(r.result.length>1500000){alert('Файл больше 1.5 МБ');return;}currentUser.avatar=r.result;const k=currentUser.nick.toLowerCase();if(USERS[k]){USERS[k].avatar=r.result;await HipindStorage.putUser(USERS[k]);}updateBubbles();};r.readAsDataURL(f);
 };
-
-if (el.theme) el.theme.addEventListener('change', e => { applyThemeToPreview(e.target.value); if (state.slides.length) renderSlides(); });
-
-if (el.generateBtn) el.generateBtn.addEventListener('click', async () => {
-  const topic = (el.topic && el.topic.value || '').trim();
-  const count = Math.max(1, Math.min(50, Number(el.slideCount && el.slideCount.value) || 5));
-  const contentStyle = (el.contentStyle && el.contentStyle.value) || 'business';
-  const theme = (el.theme && el.theme.value) || 'office';
-  if (!topic) { genStatus.textContent = 'Укажите тему презентации.'; genStatus.className = 'status err'; return; }
-  state.topic = topic; state.contentStyle = contentStyle; state.theme = theme;
-  applyThemeToPreview(theme);
-  genStatus.textContent = 'Поиск в Wikipedia (ru + en)...';
-  genStatus.className = 'status';
-  el.generateBtn.disabled = true;
-  try {
-    const { wiki, facts } = await searchTopic(topic);
-    const hasWiki = wiki && wiki.extract && wiki.extract.length > 50;
-    const hasFacts = facts.length > 0;
-    if (!hasWiki && !hasFacts) {
-      genStatus.textContent = 'Не удалось найти информацию по теме «' + topic + '» в Wikipedia. Попробуйте переформулировать запрос.';
-      genStatus.className = 'status err';
-      return;
+$('deleteAccountBtn').onclick=async()=>{
+  if(!currentUser)return;if(!confirm('Удалить аккаунт? Все данные будут удалены.'))return;
+  const k=currentUser.nick.toLowerCase();
+  const ps=await HipindStorage.getProjectsByUser(k);for(const p of ps)await HipindStorage.deleteProject(p.id);
+  await HipindStorage.deleteUser(k);await HipindStorage.setSession(null);
+  delete USERS[k];currentUser=null;updateBubbles();showLanding();
+};
+$('backToLandingBtn').onclick=showLanding;
+$('projectsBubble').onclick=async()=>{
+  const p=$('projectsPanel');if(p.classList.contains('show')){p.classList.remove('show');return;}
+  await renderProjects();p.classList.add('show');
+};
+$('theme').onchange=e=>{applyThemePreview(e.target.value);if(state.slides.length)renderSlides();};
+$('generateBtn').onclick=async()=>{
+  const topic=$('topic').value.trim();const count=Math.max(1,Math.min(50,Number($('slideCount').value)||5));const theme=$('theme').value;
+  const st=$('genStatus');
+  if(!topic){st.textContent='Укажите тему.';st.className='status err';return;}
+  state.topic=topic;state.theme=theme;applyThemePreview(theme);
+  st.textContent='Поиск в Wikipedia...';st.className='status';$('generateBtn').disabled=true;
+  try{
+    const {wiki,facts}=await searchTopic(topic);
+    if(!wiki&&!facts.length){st.textContent='Информация не найдена.';st.className='status err';return;}
+    state.slides=buildSlides(topic,count,facts,wiki);renderSlides();
+    $('revision').disabled=false;$('applyBtn').disabled=false;$('downloadBtn').disabled=false;
+    st.textContent='Готово: '+state.slides.length+' слайд(ов).';st.className='status ok';
+    if(currentUser){
+      const proj={id:'p_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),userKey:currentUser.nick.toLowerCase(),title:topic,topic,theme,slides:JSON.parse(JSON.stringify(state.slides)),date:new Date().toLocaleString('ru-RU'),createdAt:Date.now()};
+      await HipindStorage.putProject(proj);st.textContent+=' Проект сохранён.';
     }
-    state.slides = buildSlides(topic, count, facts, wiki);
-    renderSlides();
-    if (el.revision) el.revision.disabled = false;
-    if (el.applyBtn) el.applyBtn.disabled = false;
-    if (el.downloadBtn) el.downloadBtn.disabled = false;
-    let srcInfo = [];
-    if (hasWiki) srcInfo.push('Wikipedia («' + wiki.title + '», ' + wiki.lang + ')');
-    if (hasFacts) srcInfo.push('полный текст статьи (' + facts.length + ' фактов)');
-    genStatus.textContent = `Готово: ${state.slides.length} слайд(ов). Источники: ${srcInfo.join(' + ')}.`;
-    genStatus.className = 'status ok';
-    revStatus.textContent = '';
-    if (currentUser) {
-      const project = { title: topic, topic, theme, contentStyle, slides: JSON.parse(JSON.stringify(state.slides)), date: new Date().toLocaleString('ru-RU') };
-      if (await addProject(project)) genStatus.textContent += ' Проект сохранён.';
-    }
-    if (document.getElementById('projectsPanel').classList.contains('show')) await renderProjects();
-  } catch (e) {
-    genStatus.textContent = 'Ошибка поиска: ' + e.message;
-    genStatus.className = 'status err';
-  } finally {
-    el.generateBtn.disabled = false;
-  }
-});
+  }catch(e){st.textContent='Ошибка: '+e.message;st.className='status err';}finally{$('generateBtn').disabled=false;}
+};
+$('applyBtn').onclick=()=>{const t=$('revision').value.trim();if(!t){$('revStatus').textContent='Введите правки.';$('revStatus').className='status err';return;}applyRevision(t);$('revStatus').textContent='Применено.';$('revStatus').className='status ok';$('revision').value='';};
+$('downloadBtn').onclick=async()=>{const b=$('downloadBtn');b.disabled=true;b.textContent='Подготовка…';try{await exportPptx();b.textContent='Скачать .pptx';b.disabled=false;}catch(e){alert('Ошибка: '+e.message);b.textContent='Ошибка — повторить';b.disabled=false;}};
+$('themeBtn').onclick=toggleThemeMode;
 
-if (el.applyBtn) el.applyBtn.addEventListener('click', async () => {
-  try {
-    const text = (el.revision && el.revision.value || '').trim();
-    if (!text) { revStatus.textContent = 'Введите правки.'; revStatus.className = 'status err'; return; }
-    applyRevision(text);
-    revStatus.textContent = 'Правки применены.'; revStatus.className = 'status ok';
-    if (el.revision) el.revision.value = '';
-    if (currentUser) {
-      const list = await getUserProjects();
-      if (list.length) {
-        list[0].slides = JSON.parse(JSON.stringify(state.slides));
-        await HipindStorage.putProject(list[0]);
-        if (document.getElementById('projectsPanel').classList.contains('show')) await renderProjects();
-      }
-    }
-  } catch (e) {
-    revStatus.textContent = 'Ошибка: ' + (e && e.message ? e.message : e);
-    revStatus.className = 'status err';
-  }
-});
-
-if (el.downloadBtn) el.downloadBtn.addEventListener('click', async () => {
-  const btn = el.downloadBtn;
-  btn.disabled = true; btn.textContent = 'Подготовка файла…';
-  try { await exportPptx(); btn.textContent = 'Скачать .pptx'; btn.disabled = false; }
-  catch (e) { console.error(e); alert('Ошибка экспорта: ' + (e && e.message ? e.message : e)); btn.textContent = 'Ошибка — повторить'; btn.disabled = false; }
-});
-
-document.getElementById('loginBtn').addEventListener('click', () => showAuthModal('login'));
-document.getElementById('registerBtn').addEventListener('click', () => showAuthModal('register'));
-document.getElementById('closeModalBtn').addEventListener('click', hideAuthModal);
-document.getElementById('authCancelBtn').addEventListener('click', hideAuthModal);
-document.getElementById('authSubmitBtn').addEventListener('click', submitAuth);
-document.getElementById('authPass').addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(); });
-document.getElementById('authNick').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('authPass').focus(); });
-document.getElementById('authModal').addEventListener('click', e => { if (e.target.id === 'authModal') hideAuthModal(); });
-document.getElementById('logoutBtn').addEventListener('click', logout);
-
-document.getElementById('passToggle').addEventListener('click', () => {
-  const p = document.getElementById('authPass'); const t = document.getElementById('passToggle');
-  if (p.type === 'password') { p.type = 'text'; t.textContent = '🙈'; t.setAttribute('aria-label','Скрыть пароль'); }
-  else { p.type = 'password'; t.textContent = '👁'; t.setAttribute('aria-label','Показать пароль'); }
-});
-
-document.getElementById('changeAvatarBtn').addEventListener('click', () => document.getElementById('avatarInput').click());
-document.getElementById('avatarInput').addEventListener('change', (e) => {
-  const file = e.target.files && e.target.files[0];
-  if (!file || !currentUser) return;
-  if (!file.type.startsWith('image/')) { alert('Выберите файл изображения.'); return; }
-  const reader = new FileReader();
-  reader.onload = async () => {
-    const dataUrl = reader.result;
-    if (dataUrl.length > 1_500_000) { alert('Файл слишком большой. Выберите изображение меньше 1 МБ.'); return; }
-    currentUser.avatar = dataUrl;
-    const key = currentUser.nick.toLowerCase();
-    if (USERS[key]) {
-      USERS[key].avatar = dataUrl;
-      await HipindStorage.putUser(USERS[key]);
-    }
-    updateBubble();
-  };
-  reader.readAsDataURL(file);
-});
-
-document.getElementById('deleteAccountBtn').addEventListener('click', showDeleteModal);
-document.getElementById('closeDeleteBtn').addEventListener('click', hideDeleteModal);
-document.getElementById('deleteCancelBtn').addEventListener('click', hideDeleteModal);
-document.getElementById('deleteConfirmBtn').addEventListener('click', confirmDeleteAccount);
-document.getElementById('deleteModal').addEventListener('click', e => { if (e.target.id === 'deleteModal') hideDeleteModal(); });
-
-document.getElementById('projectsBubble').addEventListener('click', toggleProjectsPanel);
-document.addEventListener('click', (e) => {
-  const panel = document.getElementById('projectsPanel');
-  const bubble = document.getElementById('projectsBubble');
-  if (!panel.classList.contains('show')) return;
-  if (panel.contains(e.target) || bubble.contains(e.target)) return;
-  panel.classList.remove('show');
-});
-
-/* ======================== Инициализация ======================== */
-initStorage().then(() => applyThemeToPreview(state.theme));
+/* ============ Boot ============ */
+(async function(){
+  let saved = 'dark';
+  try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch(e) {}
+  applyThemeMode(saved);
+  applyThemePreview(state.theme);
+  await initAuth();
+})();
 </script>
 </body>
 </html>
