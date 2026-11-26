@@ -14,17 +14,18 @@
   html, body { width:100%; max-width:100%; }
   body { background:var(--ui-bg); color:var(--ui-text); min-height:100vh; min-height:100dvh; display:flex; justify-content:center; transition:background .3s, color .3s; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
 
-  #landing { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:48px 24px; overflow:hidden; background:radial-gradient(circle at 50% 30%, #2a2d33 0%, #14161a 55%, #0d0e11 100%); transition:opacity .5s; }
+  #landing { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:48px 24px; overflow:hidden; background:radial-gradient(circle at 50% 30%, #2a2d33 0%, #14161a 55%, #0d0e11 100%); transition:backdrop-filter .6s ease, background .6s ease, opacity .4s ease; }
   #landing.hidden { display:none; }
-  .land-squares { position:absolute; inset:0; z-index:0; pointer-events:none; }
-  .land-sq { position:absolute; display:block; background:transparent; border:1px solid rgba(255,255,255,0.1); border-radius:6px; animation:floatSq linear infinite; }
+  #landing.blur-warp { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); background:rgba(10,12,16,0.6); }
+  #landing.blur-warp .land-content,
+  #landing.blur-warp .land-sq,
+  #landing.blur-warp .land-glow { filter: blur(6px); transition: filter .6s ease; }
+
+  .land-squares { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .land-sq { position:absolute; display:block; background:transparent; border:1px solid rgba(255,255,255,0.1); border-radius:6px; will-change:transform; top:0; left:0; transform:translate3d(0,0,0); }
   .land-sq.fill { background:rgba(255,255,255,0.04); }
-  @keyframes floatSq { 0% { transform:translate3d(0,0,0) rotate(0deg); opacity:0; } 10% { opacity:1; } 90% { opacity:1; } 100% { transform:translate3d(0,0,0) rotate(90deg); opacity:0; } }
-  #landing.warp .land-sq { animation:none !important; }
-  .land-glow { position:absolute; top:50%; left:50%; width:720px; height:720px; transform:translate(-50%,-55%); background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%); filter:blur(20px); transition:transform 1s, opacity 1s; }
-  #landing.warp .land-glow { transform:translate(-50%,-55%) scale(4); opacity:0; }
-  .land-content { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; transition:transform 1.2s, opacity .8s, filter .8s; }
-  #landing.warp .land-content { transform:scale(3.5); opacity:0; filter:blur(12px); }
+  .land-glow { position:absolute; top:50%; left:50%; width:720px; height:720px; transform:translate(-50%,-55%); background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 65%); filter:blur(20px); }
+  .land-content { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
   .land-title { font-size:clamp(48px,11vw,150px); font-weight:800; line-height:1; text-transform:uppercase; color:#ffffff; text-shadow:0 0 40px rgba(255,255,255,0.15); }
   .land-divider { width:72px; height:2px; margin:36px auto; background:#9a9a9a; opacity:.8; }
   .land-subtitle { font-size:clamp(15px,2.2vw,24px); font-weight:300; letter-spacing:.16em; text-transform:uppercase; color:#b8bcc4; }
@@ -43,6 +44,8 @@
   .user-bubble button.ghost { background:transparent; color:var(--ui-text); border:1px solid var(--ui-border); }
   .user-bubble button.ghost:hover { background:var(--ui-field); }
   .user-bubble button:hover { filter:brightness(1.1); }
+  .user-bubble button.island { width:36px; height:36px; padding:0; border-radius:50%; background:var(--ui-field); border:1px solid var(--ui-border); font-size:16px; flex:0 0 auto; }
+  .user-bubble button.island:hover { background:var(--ui-panel); filter:none; }
 
   .theme-btn { position:fixed; top:12px; right:16px; z-index:120; width:44px; height:44px; border-radius:50%; background:var(--ui-panel); color:var(--ui-text); border:1px solid var(--ui-border); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; }
 
@@ -74,8 +77,7 @@
   .status.ok { color:#3ecf8e; } .status.err { color:#ff6b6b; }
   .panel-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-left:48px; }
 
-  .projects-bubble { position:fixed; top:12px; left:50%; transform:translateX(-50%); z-index:100; background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:999px; padding:8px 20px; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; font-weight:600; color:var(--ui-text); }
-  .projects-panel { position:fixed; top:64px; left:50%; transform:translateX(-50%); z-index:150; width:92%; max-width:560px; background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:16px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.4); display:none; max-height:70vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .projects-panel { position:fixed; top:64px; right:16px; left:auto; transform:none; z-index:150; width:92%; max-width:420px; background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:16px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.4); display:none; max-height:70vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .projects-panel.show { display:block; }
   .project-item { display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--ui-field); border:1px solid var(--ui-field-border); border-radius:10px; margin-bottom:8px; gap:8px; }
   .project-item .title { font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -102,7 +104,6 @@
   .theme-hint { display:flex; align-items:center; gap:8px; margin-top:8px; font-size:11px; color:var(--ui-muted); }
   .theme-hint .sw { width:14px; height:14px; border-radius:4px; border:1px solid var(--ui-border); flex:0 0 auto; }
 
-  /* ===== ПРОФИЛЬ-МОДАЛКА ===== */
   .profile-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:300; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   .profile-overlay.show { display:flex; }
   .profile-card { position:relative; background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:24px; padding:28px 24px 24px; width:100%; max-width:420px; color:var(--ui-text); box-shadow:0 30px 80px rgba(0,0,0,0.5); overflow:visible; max-height:90vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
@@ -128,10 +129,12 @@
   .profile-edit-row .save-btn { background:#1f9d55; }
   .profile-edit-row .cancel-btn { background:var(--btn-secondary); color:var(--btn-secondary-text); }
 
-  .profile-actions { display:flex; gap:8px; margin-top:16px; position:relative; z-index:5; }
-  .profile-actions button { flex:1; position:relative; z-index:5; pointer-events:auto; }
+  .profile-actions { display:flex; gap:8px; margin-top:16px; position:relative; z-index:5; flex-wrap:wrap; }
+  .profile-actions button { flex:1; position:relative; z-index:5; pointer-events:auto; min-width:0; }
   .profile-actions .close-profile { background:var(--btn-secondary); color:var(--btn-secondary-text); }
-  .profile-actions .danger { background:#dc2626; color:#fff; }
+  .profile-actions .logout-profile { background:var(--btn-secondary); color:var(--btn-secondary-text); border:1px solid var(--ui-border); }
+  .profile-actions .logout-profile:hover { background:var(--ui-field); }
+  .profile-actions .danger { background:#dc2626; color:#fff; flex-basis:100%; }
   .profile-actions .danger:hover { filter:brightness(1.1); }
   .profile-actions .danger:disabled { opacity:.5; cursor:not-allowed; filter:none; }
 
@@ -139,7 +142,6 @@
   .profile-msg.err { color:#ff6b6b; }
   .profile-msg.ok { color:#3ecf8e; }
 
-  /* Встроенное подтверждение удаления */
   .confirm-box { position:absolute; inset:0; background:rgba(0,0,0,0.55); display:none; align-items:center; justify-content:center; padding:20px; border-radius:24px; z-index:10; }
   .confirm-box.show { display:flex; }
   .confirm-box .inner { background:var(--ui-panel); border:1px solid var(--ui-border); border-radius:16px; padding:20px; max-width:320px; width:100%; }
@@ -161,8 +163,8 @@
   <div id="bubbleUser" style="display:none; gap:8px; align-items:center;">
     <div class="avatar" id="userAvatar">?</div>
     <div class="nick" id="userNick">—</div>
-    <button id="openProfileBtn" class="ghost" type="button" title="Профиль">Профиль</button>
-    <button id="logoutBtn" class="ghost" type="button">Выйти</button>
+    <button id="openProfileBtn" class="island" type="button" title="Профиль">👤</button>
+    <button id="projectsBubble" class="island" type="button" title="Проекты">📁</button>
   </div>
   <input type="file" id="avatarInput" accept="image/*" style="display:none">
 </div>
@@ -184,7 +186,6 @@
 
 <div id="appRoot" class="hidden">
   <button class="theme-btn" id="themeBtn" type="button"><span id="themeIcon">🌙</span></button>
-  <div class="projects-bubble" id="projectsBubble">📁 Проекты</div>
   <div class="projects-panel" id="projectsPanel">
     <h3 style="margin-bottom:12px;">Мои проекты</h3>
     <div id="projectsList"></div>
@@ -202,8 +203,8 @@
         </div>
         <label for="topic">Тема презентации</label>
         <input id="topic" type="text">
-        <label for="slideCount">Количество слайдов</label>
-        <input id="slideCount" type="number" min="1" max="50" value="5">
+        <label for="slideCount">Количество слайдов (макс. 20)</label>
+        <input id="slideCount" type="number" min="1" max="20" value="5">
         <label for="theme">Тема PowerPoint</label>
         <select id="theme">
           <option value="office">Office — синий на белом</option>
@@ -274,7 +275,6 @@
   </div>
 </div>
 
-<!-- ПРОФИЛЬ-МОДАЛКА -->
 <div class="profile-overlay" id="profileModal">
   <div class="profile-card">
     <h2>Мой профиль</h2>
@@ -301,10 +301,10 @@
     <div class="profile-msg" id="profileMsg"></div>
     <div class="profile-actions">
       <button class="close-profile" id="closeProfileBtn" type="button">Закрыть</button>
+      <button class="logout-profile" id="logoutProfileBtn" type="button">Выйти из аккаунта</button>
       <button class="danger" id="deleteAccountBtn" type="button">Удалить аккаунт</button>
     </div>
 
-    <!-- Встроенное подтверждение -->
     <div class="confirm-box" id="confirmDeleteBox">
       <div class="inner">
         <h3>Удалить аккаунт?</h3>
@@ -428,21 +428,87 @@ $('themeBtn').onclick = () => {
 };
 try{ applyThemeMode(localStorage.getItem('hipind_theme')||'dark'); }catch(e){ applyThemeMode('dark'); }
 
-/* ============ Квадраты лендинга ============ */
+/* ============ Кубики с физикой отскока ============ */
 let landSquaresList = [];
-(function(){
-  const c=$('landSquares'); if(!c) return; const rnd=(a,b)=>Math.random()*(b-a)+a;
-  for(let i=0;i<40;i++){
-    const sq=document.createElement('span'); sq.className='land-sq';
+let squaresAnimId = null;
+
+function spawnSquares(){
+  const c=$('landSquares'); if(!c) return;
+  c.innerHTML='';
+  landSquaresList=[];
+  const rnd=(a,b)=>Math.random()*(b-a)+a;
+  const vw = window.innerWidth || 1200;
+  const vh = window.innerHeight || 800;
+  const N = 40;
+  for(let i=0;i<N;i++){
+    const s = rnd(8,64);
+    const sq = document.createElement('span');
+    sq.className = 'land-sq';
     if(Math.random()<0.3) sq.classList.add('fill');
-    const s=rnd(8,64); sq.style.width=s+'px'; sq.style.height=s+'px';
-    sq.style.left=rnd(2,96)+'vw'; sq.style.top=rnd(2,94)+'vh';
-    sq.style.animationDuration=rnd(3.5,9)+'s';
-    sq.style.animationDelay=(-rnd(0,8))+'s';
-    sq.style.opacity=rnd(0.15,0.55);
-    c.appendChild(sq); landSquaresList.push(sq);
+    sq.style.width = s+'px';
+    sq.style.height = s+'px';
+    const maxX = Math.max(0, vw - s);
+    const maxY = Math.max(0, vh - s);
+    const obj = {
+      el: sq,
+      s,
+      x: rnd(0, maxX),
+      y: rnd(0, maxY),
+      vx: rnd(10, 30) * (Math.random()<0.5?-1:1),
+      vy: rnd(10, 30) * (Math.random()<0.5?-1:1),
+      rot: 0,
+      vr: rnd(-15, 15)
+    };
+    sq.style.opacity = rnd(0.15,0.55).toFixed(2);
+    c.appendChild(sq);
+    landSquaresList.push(obj);
   }
-})();
+}
+
+let lastSqTime = 0;
+function squaresStep(ts){
+  if(!lastSqTime) lastSqTime = ts;
+  let dt = (ts - lastSqTime) / 1000;
+  if(dt > 0.1) dt = 0.1;
+  lastSqTime = ts;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  for(const o of landSquaresList){
+    const maxX = Math.max(0, vw - o.s);
+    const maxY = Math.max(0, vh - o.s);
+
+    o.x += o.vx * dt;
+    o.y += o.vy * dt;
+
+    if(o.x <= 0){ o.x = 0; o.vx = Math.abs(o.vx); }
+    else if(o.x >= maxX){ o.x = maxX; o.vx = -Math.abs(o.vx); }
+
+    if(o.y <= 0){ o.y = 0; o.vy = Math.abs(o.vy); }
+    else if(o.y >= maxY){ o.y = maxY; o.vy = -Math.abs(o.vy); }
+
+    o.rot += o.vr * dt;
+    o.el.style.transform = `translate3d(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px, 0) rotate(${o.rot.toFixed(2)}deg)`;
+  }
+
+  squaresAnimId = requestAnimationFrame(squaresStep);
+}
+
+function startSquares(){ spawnSquares(); if(squaresAnimId) cancelAnimationFrame(squaresAnimId); lastSqTime=0; squaresAnimId=requestAnimationFrame(squaresStep); }
+function stopSquares(){ if(squaresAnimId){ cancelAnimationFrame(squaresAnimId); squaresAnimId=null; } }
+
+window.addEventListener('resize', () => {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  for(const o of landSquaresList){
+    const maxX = Math.max(0, vw - o.s);
+    const maxY = Math.max(0, vh - o.s);
+    if(o.x > maxX) o.x = maxX;
+    if(o.y > maxY) o.y = maxY;
+  }
+});
+
+startSquares();
 
 let noticeTimer=null;
 function showNotice(text){ const el=$('landNotice'); el.textContent=text; el.classList.add('show'); if(noticeTimer)clearTimeout(noticeTimer); noticeTimer=setTimeout(()=>el.classList.remove('show'),4000); }
@@ -512,15 +578,52 @@ async function submitAuth(){
   } catch(e){ msg.className='msg err'; msg.textContent=e.message||'Неизвестная ошибка'; }
   finally { $('authSubmitBtn').disabled=false; $('authSubmitBtn').textContent=mode==='register'?'Зарегистрироваться':'Войти'; }
 }
-async function logout(){ await storage.signOut(); currentUser=null; updateBubbles(); showLanding(); }
+
+/* ============ Выход ============ */
+async function doLogout(ev){
+  const btn = ev && ev.currentTarget ? ev.currentTarget : null;
+  const oldText = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = '...'; }
+  try {
+    const confirmBox = document.getElementById('confirmDeleteBox');
+    if (confirmBox) confirmBox.classList.remove('show');
+    if (deleteCooldownTimer) { clearInterval(deleteCooldownTimer); deleteCooldownTimer = null; }
+
+    await storage.signOut();
+
+    currentUser = null;
+    savedCred.clear();
+    state.slides = [];
+    state.topic = '';
+    renderSlides();
+    const dlBtn = document.getElementById('downloadBtn');
+    if (dlBtn) dlBtn.disabled = true;
+
+    closeProfile();
+    updateBubbles();
+    showLanding();
+
+    const notice = document.getElementById('landNotice');
+    if (notice) {
+      notice.textContent = 'Вы вышли из аккаунта.';
+      notice.classList.add('show');
+      setTimeout(() => notice.classList.remove('show'), 3000);
+    }
+  } catch (e) {
+    alert('Ошибка выхода: ' + (e.message || e));
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = oldText || 'Выйти'; }
+  }
+}
 
 /* ============ Переходы ============ */
 function animateToApp(){
   if(!currentUser){ showAuth('login'); showNotice('Сначала войдите или зарегистрируйтесь.'); return; }
   const landing=$('landing'), app=$('appRoot');
-  landing.classList.add('warp');
+  landing.classList.add('blur-warp');
+  stopSquares();
   setTimeout(()=>{
-    landing.classList.add('hidden'); landing.classList.remove('warp');
+    landing.classList.add('hidden'); landing.classList.remove('blur-warp');
     app.classList.remove('hidden');
     requestAnimationFrame(()=>requestAnimationFrame(()=>app.classList.add('show')));
     renderProjects();
@@ -529,7 +632,8 @@ function animateToApp(){
 $('startBtn').addEventListener('click', animateToApp);
 function showLanding(){
   $('appRoot').classList.add('hidden'); $('appRoot').classList.remove('show');
-  $('landing').classList.remove('hidden'); $('landing').classList.remove('warp');
+  $('landing').classList.remove('hidden'); $('landing').classList.remove('blur-warp');
+  startSquares();
 }
 
 /* ============ Проекты ============ */
@@ -622,27 +726,34 @@ async function searchTopic(topic){
   if(full&&full.text){ full.text.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(s=>s.length>40&&s.length<400).slice(2).forEach(s=>facts.push(s)); }
   return { wiki, facts };
 }
+const MAX_SLIDES = 20;
+
 function buildSlides(topic,count,facts,wiki){
+  const limit = Math.max(1, Math.min(MAX_SLIDES, Number(count)||5));
   const slides=[];
-  const intro=wiki&&wiki.extract?wiki.extract:(facts[0]||'Информация не найдена.');
+  const intro = (wiki&&wiki.extract) ? wiki.extract : (facts[0]||'Информация не найдена.');
   slides.push({ title:topic, body:[intro], isIntro:true });
-  for(let i=0;i<Math.max(0,count-2);i++){
+
+  const middleCount = Math.max(0, limit - 2);
+  for(let i=0;i<middleCount;i++){
     const body=[];
     if(i<facts.length) body.push('• '+facts[i]);
     else if(wiki&&wiki.extract){
       const ss=wiki.extract.split(/(?<=[.!?])\s+/).filter(s=>s.length>20);
-      body.push('• '+(ss[i%Math.max(1,ss.length)]||'Дополнительно.'));
+      if(ss.length) body.push('• '+(ss[i%ss.length]||'Дополнительно.'));
+      else body.push('• Недостаточно данных.');
     } else body.push('• Недостаточно данных.');
     slides.push({ title:'', body });
   }
-  if(count>1){
+  if(limit>1){
     let c='Основные выводы.';
     const last=facts.length?facts[facts.length-1]:'';
     if(last&&last.length>40) c=last;
     slides.push({ title:'Заключение', body:['• '+c] });
   }
-  return slides.slice(0,count);
+  return slides.slice(0,limit);
 }
+
 function renderSlides(){
   const c=$('slides');
   if(!state.slides.length){ c.innerHTML='<div class="empty">Презентация пуста.</div>'; return; }
@@ -747,9 +858,7 @@ async function doDeleteAccount(){
   $('confirmDeleteBox').classList.remove('show');
   const btn=$('deleteAccountBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='…';
   try{
-    console.log('[delete] start for', currentUser.id);
     const report = await storage.deleteAccount(currentUser.id,{debug:true});
-    console.log('[delete] report:', report);
     savedCred.clear();
     currentUser=null; updateBubbles(); closeProfile(); showLanding();
     state.slides=[]; state.topic=''; renderSlides();
@@ -759,7 +868,6 @@ async function doDeleteAccount(){
     else if(!report.profileDeleted && report.profileWiped) msg='Профиль обнулён, вы вышли. Физическое удаление заблокировано RLS.';
     setTimeout(()=>{ $('landNotice').textContent=msg; $('landNotice').classList.add('show'); },100);
   }catch(e){
-    console.error('[delete] FAILED:', e);
     alert('Ошибка удаления: '+(e.message||e));
   }finally{
     btn.disabled=false; btn.textContent=old||'Удалить аккаунт';
@@ -769,7 +877,6 @@ async function doDeleteAccount(){
 /* ============ Обработчики ============ */
 document.getElementById('loginBtn').addEventListener('click', () => showAuth('login'));
 document.getElementById('registerBtn').addEventListener('click', () => showAuth('register'));
-document.getElementById('logoutBtn').addEventListener('click', logout);
 document.getElementById('closeModalBtn').addEventListener('click', hideAuth);
 document.getElementById('authCancelBtn').addEventListener('click', hideAuth);
 document.getElementById('authSubmitBtn').addEventListener('click', submitAuth);
@@ -781,6 +888,7 @@ document.getElementById('passToggle').addEventListener('click', () => {
 });
 
 document.getElementById('openProfileBtn').addEventListener('click', openProfile);
+document.getElementById('logoutProfileBtn').addEventListener('click', doLogout);
 document.getElementById('profileAvatar').addEventListener('click', () => $('profileAvatarInput').click());
 document.getElementById('avatarEditBtn').addEventListener('click', () => $('profileAvatarInput').click());
 document.getElementById('profileAvatarInput').addEventListener('change', e => {
@@ -794,10 +902,8 @@ document.getElementById('cancelNickBtn').addEventListener('click', () => $('edit
 document.getElementById('closeProfileBtn').addEventListener('click', closeProfile);
 document.getElementById('profileModal').addEventListener('click', e => { if(e.target.id==='profileModal') closeProfile(); });
 
-/* Кнопка «Удалить аккаунт» -> показываем встроенное подтверждение + стартуем кулдаун */
 document.getElementById('deleteAccountBtn').addEventListener('click', (ev) => {
   ev.preventDefault(); ev.stopPropagation();
-  console.log('[delete] button clicked');
   if(!currentUser){ alert('Сначала войдите в аккаунт.'); return; }
   $('confirmDeleteBox').classList.add('show');
   startDeleteCooldown();
@@ -811,26 +917,22 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
   doDeleteAccount();
 });
 
-/* Двойной клик по «Удалить аккаунт» — удалить сразу, только если кулдаун подтверждения уже прошёл */
-document.getElementById('deleteAccountBtn').addEventListener('dblclick', (ev) => {
-  ev.preventDefault(); ev.stopPropagation();
-  if(!currentUser){ return; }
-  if($('confirmDeleteBox').classList.contains('show') && isDeleteConfirmReady()) doDeleteAccount();
-});
-
 document.getElementById('backToLandingBtn').addEventListener('click', showLanding);
+
 document.getElementById('projectsBubble').addEventListener('click', () => {
   const p=$('projectsPanel');
   if(p.classList.contains('show')){ p.classList.remove('show'); return; }
   renderProjects(); p.classList.add('show');
 });
+
 document.getElementById('theme').addEventListener('change', e => {
   applyThemePreview(e.target.value); updateThemeHint(e.target.value);
   if(state.slides.length) renderSlides();
 });
 document.getElementById('generateBtn').addEventListener('click', async () => {
   const topic=$('topic').value.trim();
-  const count=Math.max(1,Math.min(50,Number($('slideCount').value)||5));
+  let count=Math.max(1,Math.min(MAX_SLIDES,Number($('slideCount').value)||5));
+  $('slideCount').value=count;
   const st=$('genStatus');
   if(!topic){ st.textContent='Укажите тему.'; st.className='status err'; return; }
   state.topic=topic; state.theme=$('theme').value;
