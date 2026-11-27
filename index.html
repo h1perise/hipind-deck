@@ -14,6 +14,20 @@
   html, body { width:100%; max-width:100%; }
   body { background:var(--ui-bg); color:var(--ui-text); min-height:100vh; min-height:100dvh; display:flex; justify-content:center; transition:background .3s, color .3s; overflow-x:hidden; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
 
+  /* ==== Явные стили для светлой темы (работают без CSS-переменных) ==== */
+  body[data-theme-mode="light"] { background:#f4f6fb !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] .panel { background:#ffffff !important; border-color:#e2e6ef !important; }
+  body[data-theme-mode="light"] .user-bubble { background:#ffffff !important; border-color:#e2e6ef !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] .user-bubble button.ghost { color:#1a1d24 !important; border-color:#e2e6ef !important; }
+  body[data-theme-mode="light"] .user-bubble button.island { background:#f7f9fc !important; border-color:#d6dbe6 !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] .modal { background:#ffffff !important; border-color:#e2e6ef !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] .profile-card { background:#ffffff !important; border-color:#e2e6ef !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] .projects-panel { background:#ffffff !important; border-color:#e2e6ef !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] input,
+  body[data-theme-mode="light"] textarea,
+  body[data-theme-mode="light"] select { background:#f7f9fc !important; border-color:#d6dbe6 !important; color:#1a1d24 !important; }
+  body[data-theme-mode="light"] .theme-btn { background:#ffffff !important; border-color:#e2e6ef !important; color:#1a1d24 !important; }
+
   #landing { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:48px 24px; overflow:hidden; background:radial-gradient(circle at 50% 30%, #2a2d33 0%, #14161a 55%, #0d0e11 100%); transition:backdrop-filter .6s ease, background .6s ease, opacity .4s ease; }
   #landing.hidden { display:none; }
   #landing.blur-warp { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); background:rgba(10,12,16,0.6); }
@@ -319,6 +333,8 @@
 </div>
 
 <script>
+window.onerror = function(msg, url, line){ document.title = 'ERR:' + msg + ':' + line; };
+
 /* ============ Supabase ============ */
 const SUPABASE_URL = 'https://bgqotjbgswfnxupsshlm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_i0pCpugkZ8K5lxOA_ZvpqQ_VPEFP5hV';
@@ -421,11 +437,12 @@ function applyThemeMode(mode){
   document.body.setAttribute('data-theme-mode', mode);
   $('themeIcon').textContent = mode==='light'?'☀️':'🌙';
   try{ localStorage.setItem('hipind_theme',mode); }catch(e){}
+  document.title = 'HIPIND Deck — ' + mode;
 }
-$('themeBtn').onclick = () => {
+$('themeBtn').addEventListener('click', function(){
   const cur = document.documentElement.getAttribute('data-theme-mode')==='light'?'light':'dark';
   applyThemeMode(cur==='light'?'dark':'light');
-};
+});
 try{ applyThemeMode(localStorage.getItem('hipind_theme')||'dark'); }catch(e){ applyThemeMode('dark'); }
 
 /* ============ Кубики с физикой отскока ============ */
@@ -450,14 +467,11 @@ function spawnSquares(){
     const maxX = Math.max(0, vw - s);
     const maxY = Math.max(0, vh - s);
     const obj = {
-      el: sq,
-      s,
-      x: rnd(0, maxX),
-      y: rnd(0, maxY),
+      el: sq, s,
+      x: rnd(0, maxX), y: rnd(0, maxY),
       vx: rnd(10, 30) * (Math.random()<0.5?-1:1),
       vy: rnd(10, 30) * (Math.random()<0.5?-1:1),
-      rot: 0,
-      vr: rnd(-15, 15)
+      rot: 0, vr: rnd(-15, 15)
     };
     sq.style.opacity = rnd(0.15,0.55).toFixed(2);
     c.appendChild(sq);
@@ -478,20 +492,15 @@ function squaresStep(ts){
   for(const o of landSquaresList){
     const maxX = Math.max(0, vw - o.s);
     const maxY = Math.max(0, vh - o.s);
-
     o.x += o.vx * dt;
     o.y += o.vy * dt;
-
     if(o.x <= 0){ o.x = 0; o.vx = Math.abs(o.vx); }
     else if(o.x >= maxX){ o.x = maxX; o.vx = -Math.abs(o.vx); }
-
     if(o.y <= 0){ o.y = 0; o.vy = Math.abs(o.vy); }
     else if(o.y >= maxY){ o.y = maxY; o.vy = -Math.abs(o.vy); }
-
     o.rot += o.vr * dt;
     o.el.style.transform = `translate3d(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px, 0) rotate(${o.rot.toFixed(2)}deg)`;
   }
-
   squaresAnimId = requestAnimationFrame(squaresStep);
 }
 
@@ -570,11 +579,7 @@ async function submitAuth(){
     const user = mode==='register' ? await storage.signUp(email,pass,nick) : await storage.signIn(email,pass);
     currentUser = user; savedCred.save(email,pass);
     msg.className='msg ok'; msg.textContent=mode==='register'?'Успешно!':'Вход выполнен.';
-    setTimeout(()=>{
-      hideAuth();
-      updateBubbles();
-      animateToApp();
-    },300);
+    setTimeout(()=>{ hideAuth(); updateBubbles(); animateToApp(); },300);
   } catch(e){ msg.className='msg err'; msg.textContent=e.message||'Неизвестная ошибка'; }
   finally { $('authSubmitBtn').disabled=false; $('authSubmitBtn').textContent=mode==='register'?'Зарегистрироваться':'Войти'; }
 }
@@ -588,32 +593,18 @@ async function doLogout(ev){
     const confirmBox = document.getElementById('confirmDeleteBox');
     if (confirmBox) confirmBox.classList.remove('show');
     if (deleteCooldownTimer) { clearInterval(deleteCooldownTimer); deleteCooldownTimer = null; }
-
     await storage.signOut();
-
     currentUser = null;
     savedCred.clear();
-    state.slides = [];
-    state.topic = '';
+    state.slides = []; state.topic = '';
     renderSlides();
     const dlBtn = document.getElementById('downloadBtn');
     if (dlBtn) dlBtn.disabled = true;
-
-    closeProfile();
-    updateBubbles();
-    showLanding();
-
+    closeProfile(); updateBubbles(); showLanding();
     const notice = document.getElementById('landNotice');
-    if (notice) {
-      notice.textContent = 'Вы вышли из аккаунта.';
-      notice.classList.add('show');
-      setTimeout(() => notice.classList.remove('show'), 3000);
-    }
-  } catch (e) {
-    alert('Ошибка выхода: ' + (e.message || e));
-  } finally {
-    if(btn){ btn.disabled = false; btn.textContent = oldText || 'Выйти'; }
-  }
+    if (notice) { notice.textContent = 'Вы вышли из аккаунта.'; notice.classList.add('show'); setTimeout(() => notice.classList.remove('show'), 3000); }
+  } catch (e) { alert('Ошибка выхода: ' + (e.message || e)); }
+  finally { if(btn){ btn.disabled = false; btn.textContent = oldText || 'Выйти'; } }
 }
 
 /* ============ Переходы ============ */
@@ -733,7 +724,6 @@ function buildSlides(topic,count,facts,wiki){
   const slides=[];
   const intro = (wiki&&wiki.extract) ? wiki.extract : (facts[0]||'Информация не найдена.');
   slides.push({ title:topic, body:[intro], isIntro:true });
-
   const middleCount = Math.max(0, limit - 2);
   for(let i=0;i<middleCount;i++){
     const body=[];
@@ -837,19 +827,11 @@ function startDeleteCooldown(){
   let left = DELETE_COOLDOWN_SEC;
   deleteCooldownTimer = setInterval(()=>{
     left--;
-    if(left > 0){
-      btn.textContent = 'Да, удалить ('+left+')';
-    } else {
-      clearInterval(deleteCooldownTimer); deleteCooldownTimer=null;
-      btn.disabled = false;
-      btn.textContent = 'Да, удалить';
-    }
+    if(left > 0){ btn.textContent = 'Да, удалить ('+left+')'; }
+    else { clearInterval(deleteCooldownTimer); deleteCooldownTimer=null; btn.disabled = false; btn.textContent = 'Да, удалить'; }
   }, 1000);
 }
-function isDeleteConfirmReady(){
-  const btn=$('confirmDeleteBtn');
-  return !!(btn && !btn.disabled);
-}
+function isDeleteConfirmReady(){ const btn=$('confirmDeleteBtn'); return !!(btn && !btn.disabled); }
 
 /* ============ УДАЛЕНИЕ ============ */
 async function doDeleteAccount(){
@@ -867,11 +849,8 @@ async function doDeleteAccount(){
     if(!report.profileDeleted && !report.profileWiped) msg='Вы вышли. Профиль в базе остался из-за RLS.';
     else if(!report.profileDeleted && report.profileWiped) msg='Профиль обнулён, вы вышли. Физическое удаление заблокировано RLS.';
     setTimeout(()=>{ $('landNotice').textContent=msg; $('landNotice').classList.add('show'); },100);
-  }catch(e){
-    alert('Ошибка удаления: '+(e.message||e));
-  }finally{
-    btn.disabled=false; btn.textContent=old||'Удалить аккаунт';
-  }
+  }catch(e){ alert('Ошибка удаления: '+(e.message||e)); }
+  finally{ btn.disabled=false; btn.textContent=old||'Удалить аккаунт'; }
 }
 
 /* ============ Обработчики ============ */
